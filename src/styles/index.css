@@ -1,0 +1,98 @@
+@import "tailwindcss";
+
+@theme {
+  /* FONDO & BASE */
+  --color-base-espresso: #1C1008;
+  --color-base-dark-roast: #2E1B0E;
+  --color-base-crema: #FAF6F0;
+  --color-base-linen: #F2EAE0;
+  --color-base-parchment: #E8DFD0;
+
+  /* ACENTO DORADO */
+  --color-gold-amber: #C8860A;
+  --color-gold-signature: #F5C842;
+  --color-gold-light: #F9DFA0;
+  --color-gold-mist: #FFF8E6;
+
+  /* ACENTO COBRE & TERROSO */
+  --color-copper-mahogany: #7A3B1E;
+  --color-copper-base: #B5541A;
+  --color-copper-terracotta: #D4845A;
+  --color-copper-peach: #F0C4A8;
+
+  /* NEUTROS TIPOGRÁFICOS */
+  --color-text-light: #F5EDD8;
+  --color-text-mid: #A08060;
+  --color-text-muted: #6B5040;
+  --color-text-dark: #3A2418;
+
+  /* SEMANTIC TOKENS EXPLICITOS */
+  --color-bg-dark: var(--color-base-espresso);
+  --color-bg-page: var(--color-base-crema);
+  --color-bg-card: var(--color-base-linen);
+  --color-price: var(--color-copper-base);
+  --color-accent: var(--color-gold-signature);
+  --color-accent-deep: var(--color-gold-amber);
+  --color-text-body: var(--color-text-dark);
+
+  /* ESTADOS DEL SISTEMA */
+  --color-success: #2E7D5A;
+  --color-warning: var(--color-gold-amber);
+  --color-error: var(--color-copper-base);
+
+  /* Colores anteriores (por compatibilidad) */
+  --color-main-blue: #08316d;
+}
+
+:root {
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  --main-blue: #08316d;
+
+  background-color: var(--color-bg-page);
+  color: var(--color-text-body);
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.15s ease-out;
+}
+
+.sidebar-underline {
+  position: relative;
+}
+.sidebar-underline.active::after {
+  content: "";
+  position: absolute;
+  left: 16px;
+  right: 16px;
+  bottom: 6px;
+  height: 5px;
+  border-radius: 6px;
+  background: linear-gradient(
+    90deg,
+    rgba(8, 49, 109, 0.18) 0%,
+    #08316d 50%,
+    rgba(8, 49, 109, 0.18) 100%
+  );
+  filter: blur(1.5px);
+  z-index: 1;
+}

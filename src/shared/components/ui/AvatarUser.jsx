@@ -1,0 +1,119 @@
+import { useState, useEffect, useRef } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import { useAuthStore } from "../../../features/auth/store/authStore";
+import defaultAvatarImg from "../../../assets/img/avatarDefault.png";
+
+export const AvatarUser = () => {
+    const { user, logout } = useAuthStore();
+    const [open, setOpen] = useState(false);
+    const dropdownRef = useRef(null);
+    const navigate = useNavigate();
+
+    const toggleMenu = () => setOpen((prev) => !prev);
+
+    useEffect(() => {
+        const handleClickOutside = (evento) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(evento.target)) {
+                setOpen(false);
+            }
+        };
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
+
+    const handleLogout = () => {
+        logout();
+        navigate("/", { replace: true });
+    };
+
+    const getInitials = (name) => {
+        if (!name) return "U";
+        const parts = name.split(" ");
+        if (parts.length >= 2) {
+            return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
+        }
+        return name.slice(0, 2).toUpperCase();
+    };
+
+    const avatarSrc =
+        user?.profilePicture && user.profilePicture.trim() !== ""
+            ? user.profilePicture
+            : defaultAvatarImg;
+
+    const roleDisplay = user?.role
+        ? user.role.replace(/_/g, " ").toLowerCase().replace(/\b\w/g, (l) => l.toUpperCase())
+        : "Cliente";
+
+    return (
+        <div className="relative" ref={dropdownRef}>
+            <button
+                onClick={toggleMenu}
+                className="flex items-center gap-3 px-3 py-2 rounded-xl bg-bg-page/50 hover:bg-bg-page border border-accent/20 transition-all duration-300"
+            >
+                <img
+                    src={avatarSrc}
+                    alt={user?.name || user?.username}
+                    className="w-9 h-9 md:w-10 md:h-10 rounded-full object-cover border-2 border-accent/40 cursor-pointer hover:border-accent transition-colors shadow-sm drop-shadow-md"
+                    onError={(e) => {
+                        e.target.onerror = null;
+                        e.target.src = defaultAvatarImg;
+                    }}
+                />
+                <div className="hidden md:block text-left">
+                    <p className="text-sm font-semibold text-text-body">
+                        {user?.name || user?.username || "Usuario"}
+                    </p>
+                    <p className="text-xs text-text-muted">{roleDisplay}</p>
+                </div>
+            </button>
+
+            {open && (
+                <>
+                    <div
+                        className="fixed inset-0 z-10"
+                        onClick={() => setOpen(false)}
+                    />
+                    <div className="absolute right-0 mt-2 w-56 bg-bg-card border border-accent/20 rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.6)] animate-fadeIn z-20 overflow-hidden">
+                        <div className="px-5 py-4 border-b border-accent/15 bg-bg-page/40">
+                            <p className="font-semibold text-text-body text-[15px] truncate">
+                                {user?.name || user?.username}
+                            </p>
+                            <p className="text-xs text-text-muted truncate mt-0.5 tracking-wide">
+                                {user?.email}
+                            </p>
+                        </div>
+                        <ul className="p-2 text-sm text-text-body font-medium tracking-wide">
+                            <li>
+                                <Link
+                                    to="/dashboard"
+                                    className="block w-full p-2.5 rounded-lg hover:bg-accent/10 hover:text-accent transition-colors mb-1"
+                                >
+                                    Dashboard
+                                </Link>
+                            </li>
+                            {user?.role === "PLATFORM_ADMIN" && (
+                                <li>
+                                    <Link
+                                        to="/dashboard/users"
+                                        className="block w-full p-2.5 rounded-lg hover:bg-accent/10 hover:text-accent transition-colors mb-2"
+                                    >
+                                        Usuarios
+                                    </Link>
+                                </li>
+                            )}
+                            <div className="border-t border-accent/10 my-1" />
+                            <li>
+                                <button
+                                    onClick={handleLogout}
+                                    className="block w-full text-left p-2.5 rounded-lg hover:bg-error/10 text-error transition-colors mt-1 font-semibold"
+                                >
+                                    Cerrar sesión
+                                </button>
+                            </li>
+                        </ul>
+                    </div>
+                </>
+            )}
+        </div>
+    );
+};
