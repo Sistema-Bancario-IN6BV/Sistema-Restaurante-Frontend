@@ -1,5 +1,6 @@
 import { Toaster } from "react-hot-toast"
 import { AppRoutes } from "./router/AppRoutes.jsx"
+import { ConfirmModal } from "../shared/components/ui/ConfirmModal.jsx"
 
 export const App = () => {
   return (
@@ -18,6 +19,7 @@ export const App = () => {
         }
       />
       <AppRoutes />
+      <ConfirmModal />
     </>
   )
 }
