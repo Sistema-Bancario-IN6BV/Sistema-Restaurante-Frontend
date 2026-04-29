@@ -1,21 +1,32 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import { AuthPage } from "../../features/auth/pages/AuthPage.jsx";
-import { useAuthStore } from "../../features/auth/store/authStore";
+import { UnauthorizedPage } from "../../features/auth/pages/UnauthorizedPage.jsx";
+import { VerifyEmailPage } from "../../features/auth/pages/VerifyEmailPage.jsx";
+import { ProtectedRoute } from "./ProtectedRoute.jsx";
+import { RoleGuard } from "./RoleGuard.jsx";
 
 import { Users } from "../../features/users/components/Users.jsx";
-import { DashboardHome } from "../../features/dashboard/pages/DashboardHome.jsx";
 import { DashboardPage } from "../Layouts/DashboardPage.jsx";
 
 export const AppRoutes = () => {
     return (
         <Routes>
+            {/* RUTAS PUBLICAS */}
             <Route path="/" element={<AuthPage />} />
+            <Route path="/verify-email" element={<VerifyEmailPage />} />
+            <Route path="/unauthorized" element={<UnauthorizedPage />} />
 
+            {/* PROTECTED ROUTES + ROLE */}
             <Route
                 path="/dashboard"
-                element={<DashboardPage />}
+                element={
+                    <ProtectedRoute>
+                        <RoleGuard allowedRole={["RESTAURANT_ADMIN", "PLATFORM_ADMIN"]}>
+                            <DashboardPage />
+                        </RoleGuard>
+                    </ProtectedRoute>
+                }
             >
-                <Route index element={<DashboardHome />} />
                 <Route path="users" element={<Users />} />
             </Route>
 
