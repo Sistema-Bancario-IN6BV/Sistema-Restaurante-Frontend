@@ -30,6 +30,7 @@ axiosAuth.interceptors.request.use((config) => {
 axiosAdmin.interceptors.request.use((config) => {
     const token = useAuthStore.getState().token;
     if (token) {
+        config.headers = config.headers || {};
         config.headers.Authorization = `Bearer ${token}`;
     }
     return config;

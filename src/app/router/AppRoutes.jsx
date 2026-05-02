@@ -6,6 +6,7 @@ import { ProtectedRoute } from "./ProtectedRoute.jsx";
 import { RoleGuard } from "./RoleGuard.jsx";
 
 import { Users } from "../../features/users/components/Users.jsx";
+import { Reservations } from "../../features/reservation/components/Reservation.jsx";
 import { Ingredients } from "../../features/inventory/components/Ingredients.jsx";
 import { Inventory } from "../../features/inventory/components/Inventory.jsx";
 import { DashboardPage } from "../Layouts/DashboardPage.jsx";
@@ -30,6 +31,7 @@ export const AppRoutes = () => {
                 }
             >
                 <Route path="users" element={<Users />} />
+                <Route path="reservations" element={<Reservations />} />
                 <Route path="ingredients" element={<Ingredients />} />
                 <Route path="inventory" element={<Inventory />} />
             </Route>
