@@ -10,10 +10,37 @@ export const useAuthStore = create(
         (set, get) => ({
             user: null,
             token: null,
+            refreshToken: null,
             expiresAt: null,
             loading: false,
             error: null,
             isAuthenticated: false,
+            isLoadingAuth: true,
+
+            checkAuth: () => {
+                const token = get().token;
+                const role = get().user?.role;
+                const isAdmin = role === "RESTAURANT_ADMIN" || role === "PLATFORM_ADMIN";
+
+                if (token && !isAdmin) {
+                    set({
+                        user: null,
+                        token: null,
+                        refreshToken: null,
+                        expiresAt: null,
+                        isAuthenticated: false,
+                        isLoadingAuth: false,
+                        loading: false,
+                        error: ""
+                    })
+                    return;
+                }
+
+                set({
+                    isLoadingAuth: false,
+                    isAuthenticated: Boolean(token) && isAdmin
+                })
+            },
 
             logout: () => {
                 set({

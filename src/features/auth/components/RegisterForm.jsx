@@ -26,7 +26,7 @@ export const RegisterForm = ({ onSwitch }) => {
 
         const res = await registerStore(formData);
         if (res.success) {
-            toast.success("¡Cuenta creada exitosamente! Ahora puedes iniciar sesión.", {
+            toast.success("¡Cuenta creada exitosamente! Revisa tu correo electrónico para verificar tu cuenta.", {
                 duration: 4000,
                 style: {
                     background: '#1C1008',
