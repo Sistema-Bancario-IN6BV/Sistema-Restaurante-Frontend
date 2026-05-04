@@ -1,5 +1,10 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import { AuthPage } from "../../features/auth/pages/AuthPage.jsx";
+import { RequireAuth } from "./RequireAuth.jsx";
+
+import { Users } from "../../features/users/components/Users.jsx";
+import { Restaurants } from "../../features/restaurants/components/Restaurants.jsx";
+import { DashboardHome } from "../../features/dashboard/pages/DashboardHome.jsx";
 import { UnauthorizedPage } from "../../features/auth/pages/UnauthorizedPage.jsx";
 import { VerifyEmailPage } from "../../features/auth/pages/VerifyEmailPage.jsx";
 import { ProtectedRoute } from "./ProtectedRoute.jsx";
@@ -23,6 +28,13 @@ export const AppRoutes = () => {
             <Route
                 path="/dashboard"
                 element={
+                    <RequireAuth>
+                        <DashboardPage />
+                    </RequireAuth>
+                }
+            >
+                <Route index element={<DashboardHome />} />
+                <Route path="restaurants" element={<Restaurants />} />
                     <ProtectedRoute>
                         <RoleGuard allowedRole={["RESTAURANT_ADMIN", "PLATFORM_ADMIN"]}>
                             <DashboardPage />
