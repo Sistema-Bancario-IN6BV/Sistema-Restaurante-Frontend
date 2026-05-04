@@ -6,6 +6,7 @@ import { ProtectedRoute } from "./ProtectedRoute.jsx";
 import { RoleGuard } from "./RoleGuard.jsx";
 
 import { Users } from "../../features/users/components/Users.jsx";
+import { Events } from "../../features/events/pages/Events.jsx";
 import { DashboardPage } from "../Layouts/DashboardPage.jsx";
 
 export const AppRoutes = () => {
@@ -28,6 +29,7 @@ export const AppRoutes = () => {
                 }
             >
                 <Route path="users" element={<Users />} />
+                <Route path="events" element={<Events />} />
             </Route>
 
             <Route path="*" element={<Navigate to="/" replace />} />
