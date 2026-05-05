@@ -25,6 +25,16 @@ export const AppRoutes = () => {
             <Route 
                 path="/dashboard" 
                 element={
+                    <ProtectedRoute>
+                        <RoleGuard allowedRole={["RESTAURANT_ADMIN", "PLATFORM_ADMIN"]}>
+                            <DashboardPage />
+                        </RoleGuard>
+                    </ProtectedRoute>
+                }
+            >
+                <Route index element={<DashboardHome />} />
+                <Route path="restaurants" element={<Restaurants />} />
+                <Route path="users" element={<Users />} />
                     <RequireAuth>
                         <DashboardPage />
                     </RequireAuth>
