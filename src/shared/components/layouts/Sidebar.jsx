@@ -6,10 +6,11 @@ const menuItemsByRole = {
         { label: "Dashboard", to: "/dashboard", icon: "https://api.iconify.design/noto/bar-chart.svg" },
         { label: "Restaurantes", to: "/dashboard/restaurants", icon: "https://api.iconify.design/noto/convenience-store.svg" },
         { label: "Usuarios", to: "/dashboard/users", icon: "https://api.iconify.design/noto/busts-in-silhouette.svg" },
-        { label: "Reportes", to: "/dashboard/reports", icon: "https://api.iconify.design/noto/chart-increasing.svg" },
+{ label: "Reportes", to: "/dashboard/reports", icon: "https://api.iconify.design/noto/chart-increasing.svg" },
     ],
     RESTAURANT_ADMIN: [
         { label: "Dashboard", to: "/dashboard", icon: "https://api.iconify.design/noto/bar-chart.svg" },
+        { label: "Eventos", to: "/dashboard/events", icon: "https://api.iconify.design/noto/party-popper.svg" },
         { label: "Pedidos", to: "/dashboard/orders", icon: "https://api.iconify.design/noto/package.svg" },
         { label: "Menú", to: "/dashboard/menu", icon: "https://api.iconify.design/noto/open-book.svg" },
         { label: "Mesas", to: "/dashboard/tables", icon: "https://api.iconify.design/noto/chair.svg" },
