@@ -10,7 +10,6 @@ import { VerifyEmailPage } from "../../features/auth/pages/VerifyEmailPage.jsx";
 import { ProtectedRoute } from "./ProtectedRoute.jsx";
 import { RoleGuard } from "./RoleGuard.jsx";
 
-import { Users } from "../../features/users/components/Users.jsx";
 import { Reservations } from "../../features/reservation/components/Reservation.jsx";
 import { Ingredients } from "../../features/inventory/components/Ingredients.jsx";
 import { Inventory } from "../../features/inventory/components/Inventory.jsx";
@@ -28,13 +27,6 @@ export const AppRoutes = () => {
             <Route
                 path="/dashboard"
                 element={
-                    <RequireAuth>
-                        <DashboardPage />
-                    </RequireAuth>
-                }
-            >
-                <Route index element={<DashboardHome />} />
-                <Route path="restaurants" element={<Restaurants />} />
                     <ProtectedRoute>
                         <RoleGuard allowedRole={["RESTAURANT_ADMIN", "PLATFORM_ADMIN"]}>
                             <DashboardPage />
@@ -42,6 +34,8 @@ export const AppRoutes = () => {
                     </ProtectedRoute>
                 }
             >
+                <Route index element={<DashboardHome />} />
+                <Route path="restaurants" element={<Restaurants />} />
                 <Route path="users" element={<Users />} />
                 <Route path="reservations" element={<Reservations />} />
                 <Route path="ingredients" element={<Ingredients />} />
