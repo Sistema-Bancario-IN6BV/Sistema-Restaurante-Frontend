@@ -1,9 +1,11 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Spinner } from "../../../shared/components/layouts/Spinner.jsx";
 import { showError, showSuccess } from "../../../shared/utils/toast.js";
 import { axiosAdmin } from "../../../shared/api/api.js";
 import { CreateRestaurantModal } from "./CreateRestaurantModal.jsx";
 import { RestaurantDetailModal } from "./RestaurantDetailModal.jsx";
+
 
 const PAGE_SIZE = 8;
 
@@ -70,14 +72,11 @@ const formatCurrency = (value) => {
 	}).format(Number(value));
 };
 
-const buildAddress = (restaurant) => {
-	const address = restaurant?.address || {};
-	return [address.street, address.city, address.state, address.zipCode]
-		.filter(Boolean)
-		.join(", ");
-};
+
+
 
 export const Restaurants = () => {
+	const navigate = useNavigate();
 
 	const [restaurants, setRestaurants] = useState([]);
 	const [loading, setLoading] = useState(false);
@@ -246,8 +245,10 @@ export const Restaurants = () => {
 					className="bg-accent px-6 py-2 rounded-xl text-bg-dark font-bold hover:bg-gold-light shadow-lg transition flex items-center gap-2"
 					onClick={() => setOpenCreateModal(true)}
 				>
-					+ Agregar Restaurante
+						+ Agregar Restaurante
 				</button>
+
+
 			</div>
 
 			<div className="bg-bg-card rounded-xl border border-accent/10 shadow-lg p-4 mb-4">

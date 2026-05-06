@@ -28,6 +28,7 @@ const menuItemsByRole = {
         { label: "Menú", to: "/dashboard/menu", icon: BookOpenIcon },
         { label: "Mesas", to: "/dashboard/tables", icon: TableCellsIcon },
         { label: "Reservas", to: "/dashboard/reservations", icon: CalendarDaysIcon },
+        { label: "Eventos", to: "/dashboard/events", icon: CalendarDaysIcon },
         { label: "Facturas", to: "/dashboard/invoices", icon: ReceiptPercentIcon },
         { label: "Inventario", to: "/dashboard/inventory", icon: InboxStackIcon },
         { label: "Ingredientes", to: "/dashboard/ingredients", icon: BeakerIcon },
