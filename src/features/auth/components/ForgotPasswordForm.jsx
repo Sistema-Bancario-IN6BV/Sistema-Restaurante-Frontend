@@ -1,32 +1,32 @@
 
-import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
+import { useAuthStore } from '../store/authStore';
 
 export const ForgotPasswordForm = ({ onSwitch }) => {
-  const [loading, setLoading] = useState(false);
+  const forgotPassword = useAuthStore((state) => state.forgotPassword);
+  const loading = useAuthStore((state) => state.loading);
+  const error = useAuthStore((state) => state.error);
   const { register, handleSubmit, formState: { errors } } = useForm();
 
   const onSubmit = async (data) => {
-    setLoading(true);
-    // Simular petición al backend
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    setLoading(false);
+    const res = await forgotPassword({ email: data.email });
     
-    toast.success("Si el correo existe, recibirás instrucciones pronto.", {
-        duration: 4000,
-        style: {
-            background: '#1C1008',
-            color: '#F5C842',
-            border: '1px solid #C8860A'
-        },
-        iconTheme: {
-            primary: '#F5C842',
-            secondary: '#1C1008',
-        },
-    });
-    console.log(data);
-    onSwitch();
+    if (res.success) {
+      toast.success("Si el correo existe, recibirás instrucciones pronto.", {
+          duration: 4000,
+          style: {
+              background: '#1C1008',
+              color: '#F5C842',
+              border: '1px solid #C8860A'
+          },
+          iconTheme: {
+              primary: '#F5C842',
+              secondary: '#1C1008',
+          },
+      });
+      onSwitch();
+    }
   };
 
   return (
@@ -65,6 +65,15 @@ export const ForgotPasswordForm = ({ onSwitch }) => {
           </p>
         )}
       </div>
+
+      {error && (
+        <div className="bg-error/10 border border-error/30 text-error p-3 rounded-lg text-sm flex items-center gap-3 mt-4 shadow-sm animate-fade-in">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span>{error}</span>
+        </div>
+      )}
 
       <button
         type="submit"
