@@ -7,8 +7,7 @@ export const RegisterForm = ({ onSwitch }) => {
     const loading = useAuthStore((state) => state.loading);
     const error = useAuthStore((state) => state.error);
 
-    const { register, handleSubmit, formState: { errors }, watch } = useForm();
-    const password = watch("password");
+    const { register, handleSubmit, formState: { errors } } = useForm();
 
     const onSubmit = async (data) => {
         const formData = new FormData();
@@ -18,7 +17,6 @@ export const RegisterForm = ({ onSwitch }) => {
         formData.append("phone", data.phone);
         formData.append("email", data.email);
         formData.append("password", data.password);
-        formData.append("confirmPassword", data.confirmPassword);
         
         if (data.profilePicture && data.profilePicture.length > 0) {
             formData.append("profilePicture", data.profilePicture[0]);
@@ -38,7 +36,7 @@ export const RegisterForm = ({ onSwitch }) => {
                     secondary: '#1C1008',
                 },
             });
-            onSwitch(); // Volver al login
+            onSwitch();
         }
     };
 
@@ -89,13 +87,17 @@ export const RegisterForm = ({ onSwitch }) => {
 
                     <div className="relative flex-1">
                         <label className="block text-xs font-medium text-text-body tracking-wide mb-1.5">
-                            TELÉFONO
+                            TELÉFONO (8 dígitos)
                         </label>
                         <input
                             type="tel"
-                            placeholder="+502 1234 5678"
+                            placeholder="12345678"
                             className="w-full px-4 py-2.5 text-sm bg-bg-page border border-text-mid/30 rounded-lg focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent text-text-dark placeholder:text-text-muted transition-all duration-300 shadow-sm"
-                            {...register("phone", { required: "Obligatorio" })}
+                            {...register("phone", { 
+                                required: "Obligatorio",
+                                minLength: { value: 8, message: "Exactamente 8 dígitos" },
+                                maxLength: { value: 8, message: "Exactamente 8 dígitos" }
+                            })}
                         />
                         {errors.phone && <p className="text-error text-[10px] mt-1 absolute font-medium">* {errors.phone.message}</p>}
                     </div>
@@ -133,38 +135,20 @@ export const RegisterForm = ({ onSwitch }) => {
                     {errors.profilePicture && <p className="text-error text-[10px] mt-1 absolute font-medium">* {errors.profilePicture.message}</p>}
                 </div>
 
-                <div className="flex gap-4 pt-2">
-                    <div className="relative flex-1">
-                        <label className="block text-xs font-medium text-text-body tracking-wide mb-1.5">
-                            CONTRASEÑA
-                        </label>
-                        <input
-                            type="password"
-                            placeholder="••••••••"
-                            className="w-full px-4 py-2.5 text-sm bg-bg-page border border-text-mid/30 rounded-lg focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent text-text-dark placeholder:text-text-muted transition-all duration-300 shadow-sm"
-                            {...register("password", { 
-                                required: "Obligatoria",
-                                minLength: { value: 6, message: "Mínimo 6" }
-                            })}
-                        />
-                        {errors.password && <p className="text-error text-[10px] mt-1 absolute font-medium">* {errors.password.message}</p>}
-                    </div>
-
-                    <div className="relative flex-1">
-                        <label className="block text-xs font-medium text-text-body tracking-wide mb-1.5">
-                            CONFIRMAR
-                        </label>
-                        <input
-                            type="password"
-                            placeholder="••••••••"
-                            className="w-full px-4 py-2.5 text-sm bg-bg-page border border-text-mid/30 rounded-lg focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent text-text-dark placeholder:text-text-muted transition-all duration-300 shadow-sm"
-                            {...register("confirmPassword", { 
-                                required: "Confirma",
-                                validate: value => value === password || "No coinciden"
-                            })}
-                        />
-                        {errors.confirmPassword && <p className="text-error text-[10px] mt-1 absolute font-medium">* {errors.confirmPassword.message}</p>}
-                    </div>
+                <div className="relative pt-2">
+                    <label className="block text-xs font-medium text-text-body tracking-wide mb-1.5">
+                        CONTRASEÑA
+                    </label>
+                    <input
+                        type="password"
+                        placeholder="••••••••"
+                        className="w-full px-4 py-2.5 text-sm bg-bg-page border border-text-mid/30 rounded-lg focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent text-text-dark placeholder:text-text-muted transition-all duration-300 shadow-sm"
+                        {...register("password", { 
+                            required: "Obligatoria",
+                            minLength: { value: 8, message: "Mínimo 8 caracteres" }
+                        })}
+                    />
+                    {errors.password && <p className="text-error text-[10px] mt-1 absolute font-medium">* {errors.password.message}</p>}
                 </div>
             </div>
 
