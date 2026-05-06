@@ -11,6 +11,7 @@ export const useAuthStore = create(
     persist(
         (set, get) => ({
             user: null,
+            userId: null,
             token: null,
             refreshToken: null,
             expiresAt: null,
@@ -27,6 +28,7 @@ export const useAuthStore = create(
                 if (token && !isAdmin) {
                     set({
                         user: null,
+                        userId: null,
                         token: null,
                         refreshToken: null,
                         expiresAt: null,
@@ -47,6 +49,7 @@ export const useAuthStore = create(
             logout: () => {
                 set({
                     user: null,
+                    userId: null,
                     token: null,
                     expiresAt: null,
                     isAuthenticated: false
@@ -79,6 +82,7 @@ export const useAuthStore = create(
 
                     set({
                         user: data.userDetails,
+                        userId: data.userDetails?.id,
                         token: data.token,
                         expiresAt: data.expiresAt || null,
                         loading: false,
