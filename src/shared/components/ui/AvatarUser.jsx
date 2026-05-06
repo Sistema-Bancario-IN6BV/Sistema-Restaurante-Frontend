@@ -36,7 +36,7 @@ export const AvatarUser = () => {
     };
 
     const avatarSrc =
-        user?.profilePicture && user.profilePicture.trim() !== ""
+        user?.profilePicture && user.profilePicture.trim() !== "" && !user.profilePicture.includes("default-avatar_ewzxwx.png")
             ? user.profilePicture
             : defaultAvatarImg;
 
