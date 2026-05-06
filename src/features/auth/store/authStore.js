@@ -2,13 +2,16 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import {
     login as loginRequest,
-    register as registerRequest
+    register as registerRequest,
+    forgotPassword as forgotPasswordRequest,
+    resetPassword as resetPasswordRequest
 } from "../../../shared/api"
 
 export const useAuthStore = create(
     persist(
         (set, get) => ({
             user: null,
+            userId: null,
             token: null,
             refreshToken: null,
             expiresAt: null,
@@ -25,6 +28,7 @@ export const useAuthStore = create(
                 if (token && !isAdmin) {
                     set({
                         user: null,
+                        userId: null,
                         token: null,
                         refreshToken: null,
                         expiresAt: null,
@@ -45,6 +49,7 @@ export const useAuthStore = create(
             logout: () => {
                 set({
                     user: null,
+                    userId: null,
                     token: null,
                     expiresAt: null,
                     isAuthenticated: false
@@ -77,6 +82,7 @@ export const useAuthStore = create(
 
                     set({
                         user: data.userDetails,
+                        userId: data.userDetails?.id,
                         token: data.token,
                         expiresAt: data.expiresAt || null,
                         loading: false,
@@ -91,6 +97,32 @@ export const useAuthStore = create(
                         err.response?.data?.message || "Error de autenticación";
                     set({ error: message, loading: false })
                     return { success: false, error: message }
+                }
+            },
+
+            forgotPassword: async (email) => {
+                try {
+                    set({ loading: true, error: null });
+                    const { data } = await forgotPasswordRequest(email);
+                    set({ loading: false });
+                    return { success: true, message: data.message };
+                } catch (err) {
+                    const message = err.response?.data.message || "Error al enviar correo de recuperación";
+                    set({ error: message, loading: false });
+                    return { success: false, error: message };
+                }
+            },
+
+            resetPassword: async (token, newPassword) => {
+                try {
+                    set({ loading: true, error: null });
+                    const { data } = await resetPasswordRequest(token, newPassword);
+                    set({ loading: false });
+                    return { success: true, message: data.message };
+                } catch (err) {
+                    const message = err.response?.data.message || "Error al restablecer la contraseña";
+                    set({ error: message, loading: false });
+                    return { success: false, error: message };
                 }
             }
         }),

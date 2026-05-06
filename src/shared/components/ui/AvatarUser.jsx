@@ -85,8 +85,25 @@ export const AvatarUser = () => {
                         <ul className="p-2 text-sm text-text-body font-medium tracking-wide">
                             <li>
                                 <Link
+                                    to="/perfil"
+                                    className="flex items-center gap-2 w-full p-2.5 rounded-lg hover:bg-accent/10 hover:text-accent transition-colors mb-1"
+                                >
+                                    Mi Perfil
+                                </Link>
+                            </li>
+                            <li>
+                                <Link
+                                    to="/notificaciones"
+                                    className="flex items-center gap-2 w-full p-2.5 rounded-lg hover:bg-accent/10 hover:text-accent transition-colors mb-1"
+                                >
+                                    Notificaciones
+                                </Link>
+                            </li>
+                            <div className="border-t border-accent/10 my-1" />
+                            <li>
+                                <Link
                                     to="/dashboard"
-                                    className="block w-full p-2.5 rounded-lg hover:bg-accent/10 hover:text-accent transition-colors mb-1"
+                                    className="flex items-center gap-2 w-full p-2.5 rounded-lg hover:bg-accent/10 hover:text-accent transition-colors mb-1"
                                 >
                                     Dashboard
                                 </Link>
