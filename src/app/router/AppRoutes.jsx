@@ -14,7 +14,8 @@ import { Reservations } from "../../features/reservation/components/Reservation.
 import { Ingredients } from "../../features/inventory/components/Ingredients.jsx";
 import { Inventory } from "../../features/inventory/components/Inventory.jsx";
 import { DashboardPage } from "../Layouts/DashboardPage.jsx";
- 
+import { ReportsPage } from "../../features/dashboard/pages/ReportsPage.jsx";
+
 export const AppRoutes = () => {
     return (
         <Routes>
@@ -40,6 +41,7 @@ export const AppRoutes = () => {
                 <Route path="reservations" element={<Reservations />} />
                 <Route path="ingredients" element={<Ingredients />} />
                 <Route path="inventory" element={<Inventory />} />
+                <Route path="reports" element={<ReportsPage />} />
             </Route>
  
             <Route path="*" element={<Navigate to="/" replace />} />
