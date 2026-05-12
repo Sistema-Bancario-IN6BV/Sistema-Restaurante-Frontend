@@ -13,6 +13,7 @@ import { RoleGuard } from "./RoleGuard.jsx";
 import { Reservations } from "../../features/reservation/components/Reservation.jsx";
 import { Ingredients } from "../../features/inventory/components/Ingredients.jsx";
 import { Inventory } from "../../features/inventory/components/Inventory.jsx";
+import { Events } from "../../features/events/pages/Events.jsx";
 import { DashboardPage } from "../Layouts/DashboardPage.jsx";
 import { ReportsPage } from "../../features/dashboard/pages/ReportsPage.jsx";
 
@@ -38,6 +39,7 @@ export const AppRoutes = () => {
                 <Route index element={<DashboardHome />} />
                 <Route path="restaurants" element={<Restaurants />} />
                 <Route path="users" element={<Users />} />
+                <Route path="events" element={<Events />} />
                 <Route path="reservations" element={<Reservations />} />
                 <Route path="ingredients" element={<Ingredients />} />
                 <Route path="inventory" element={<Inventory />} />

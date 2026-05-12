@@ -39,7 +39,7 @@ export const Events = () => {
     // establecer el primer restaurante por defecto cuando carguen
     useEffect(() => {
         if (restaurants.length > 0 && !selectedRestaurantId) {
-            setSelectedRestaurantId(restaurants[0].id);
+setSelectedRestaurantId(restaurants[0]?._id || "");
         }
     }, [restaurants, selectedRestaurantId]);
 
@@ -90,7 +90,7 @@ const handleSave = async (formData) => {
             result = await updateEvent(selectedEvent.id, formData);
         } else {
             // Crear nuevo evento - incluir restaurantId
-            const restaurantId = selectedRestaurantId || restaurants[0]?.id;
+const restaurantId = selectedRestaurantId || restaurants[0]?._id;
             console.log("Creating event with restaurantId:", restaurantId, "restaurants:", restaurants);
             
             if (!restaurantId) {
