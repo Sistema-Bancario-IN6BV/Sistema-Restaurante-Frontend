@@ -3,6 +3,9 @@ import { useReservationStore } from "../store/useReservationStore.js";
 import { Spinner } from "../../../shared/components/layouts/Spinner.jsx";
 import { useEffect as useToastEffect } from "react";
 import { showError } from "../../../shared/utils/toast.js";
+import {
+    CheckCircleIcon
+} from "@heroicons/react/24/outline";
 
 import {
     ClockIcon,
@@ -16,7 +19,12 @@ import {
 
 export const Reservations = () => {
 
-    const { reservations, getReservationsForAdmin } = useReservationStore();
+    const {
+    reservations,
+    getReservationsForAdmin,
+    cancelReservation,
+    confirmReservation
+} = useReservationStore();
 
     useEffect(() => {
         getReservationsForAdmin();
@@ -111,7 +119,18 @@ export const Reservations = () => {
                                 Editar
                             </button>
 
-                            <button className="inline-flex items-center gap-2 rounded-lg border border-error/30 bg-error/5 hover:bg-error/10 px-4 py-2 text-xs font-semibold text-error transition-colors">
+                            <button
+                                onClick={() => confirmReservation(reservation._id)}
+                                className="inline-flex items-center gap-2 rounded-lg border border-green-500/30 bg-green-500/10 hover:bg-green-500/20 px-4 py-2 text-xs font-semibold text-green-600 transition-colors"
+                            >
+                                <CheckCircleIcon className="h-4 w-4" />
+                                Confirmar
+                            </button>
+
+                            <button
+                                onClick={() => cancelReservation(reservation._id)}
+                                className="inline-flex items-center gap-2 rounded-lg border border-error/30 bg-error/5 hover:bg-error/10 px-4 py-2 text-xs font-semibold text-error transition-colors"
+                            >
                                 <TrashIcon className="h-4 w-4" />
                                 Cancelar
                             </button>
