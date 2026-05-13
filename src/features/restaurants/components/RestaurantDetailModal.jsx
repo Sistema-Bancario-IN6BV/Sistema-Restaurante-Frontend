@@ -46,13 +46,17 @@ const categoryBadgeClass = {
 
 const restaurantCoverUrl = (path) => {
     if (!path) return null;
-    if (path.startsWith("http://") || path.startsWith("https://")) {
-        return path;
+    const value = typeof path === "object"
+        ? path.secure_url || path.url || path.path || path.location || path.filename || null
+        : path;
+    if (!value) return null;
+    if (value.startsWith("http://") || value.startsWith("https://")) {
+        return value;
     }
     const cloudinaryBase =
         import.meta.env.VITE_CLOUDINARY_BASE_URL ||
         "https://res.cloudinary.com/db5rnorf/image/upload/";
-    return `${cloudinaryBase}${path.replace(/^\/+/, "")}`;
+    return `${cloudinaryBase}${String(value).replace(/^\/+/, "")}`;
 };
 
 export const RestaurantDetailModal = ({

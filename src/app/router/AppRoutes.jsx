@@ -4,6 +4,7 @@ import { RequireAuth } from "./RequireAuth.jsx";
  
 import { Users } from "../../features/users/components/Users.jsx";
 import { Restaurants } from "../../features/restaurants/components/Restaurants.jsx";
+import { MenuItems } from "../../features/menuItems/components/MenuItems.jsx";
 import { DashboardHome } from "../../features/dashboard/pages/DashboardHome.jsx";
 import { UnauthorizedPage } from "../../features/auth/pages/UnauthorizedPage.jsx";
 import { VerifyEmailPage } from "../../features/auth/pages/VerifyEmailPage.jsx";
@@ -38,6 +39,8 @@ export const AppRoutes = () => {
             >
                 <Route index element={<DashboardHome />} />
                 <Route path="restaurants" element={<Restaurants />} />
+                <Route path="restaurants/:restaurantId/menu-items" element={<MenuItems />} />
+                <Route path="menu-items" element={<MenuItems />} />
                 <Route path="users" element={<Users />} />
                 <Route path="events" element={<Events />} />
                 <Route path="reservations" element={<Reservations />} />
