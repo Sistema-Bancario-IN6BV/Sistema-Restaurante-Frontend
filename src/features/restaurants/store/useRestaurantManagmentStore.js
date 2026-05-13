@@ -27,7 +27,7 @@ export const useRestaurantManagmentStore = create((set, get) => ({
             );
 
             const restaurants = get().restaurants.map((r) =>
-                r.id === updatedRestaurant.id ? { ...r, active: updatedRestaurant.active } : r
+r._id === updatedRestaurant._id ? { ...r, active: updatedRestaurant.active } : r
             )
 
             set({ restaurants, loading: false })

@@ -4,6 +4,7 @@ import { RequireAuth } from "./RequireAuth.jsx";
  
 import { Users } from "../../features/users/components/Users.jsx";
 import { Restaurants } from "../../features/restaurants/components/Restaurants.jsx";
+import { MenuItems } from "../../features/menuItems/components/MenuItems.jsx";
 import { DashboardHome } from "../../features/dashboard/pages/DashboardHome.jsx";
 import { UnauthorizedPage } from "../../features/auth/pages/UnauthorizedPage.jsx";
 import { VerifyEmailPage } from "../../features/auth/pages/VerifyEmailPage.jsx";
@@ -13,6 +14,7 @@ import { RoleGuard } from "./RoleGuard.jsx";
 import { Reservations } from "../../features/reservation/components/Reservation.jsx";
 import { Ingredients } from "../../features/inventory/components/Ingredients.jsx";
 import { Inventory } from "../../features/inventory/components/Inventory.jsx";
+import { Events } from "../../features/events/pages/Events.jsx";
 import { DashboardPage } from "../Layouts/DashboardPage.jsx";
 import { ReportsPage } from "../../features/dashboard/pages/ReportsPage.jsx";
 
@@ -37,7 +39,10 @@ export const AppRoutes = () => {
             >
                 <Route index element={<DashboardHome />} />
                 <Route path="restaurants" element={<Restaurants />} />
+                <Route path="restaurants/:restaurantId/menu-items" element={<MenuItems />} />
+                <Route path="menu-items" element={<MenuItems />} />
                 <Route path="users" element={<Users />} />
+                <Route path="events" element={<Events />} />
                 <Route path="reservations" element={<Reservations />} />
                 <Route path="ingredients" element={<Ingredients />} />
                 <Route path="inventory" element={<Inventory />} />
