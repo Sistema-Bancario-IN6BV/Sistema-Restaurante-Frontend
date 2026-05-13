@@ -3,10 +3,13 @@ import {
     getReservationsForAdmin as getReservationsRequest,
     cancelReservationRequest,
     confirmReservationRequest,
+    getRestaurantTables as getRestaurantTablesRequest,
+    createReservation as createReservationRequest
 } from "../../../shared/api/admin";
 
 export const useReservationStore = create((set, get) => ({
     reservations: [],
+    tables: [],
     reservation: null,
     loading: false,
     error: null,
@@ -67,4 +70,36 @@ export const useReservationStore = create((set, get) => ({
             console.log(error);
         }
     },
+
+    getRestaurantTables: async (restaurantId) => {
+        try {
+            const response = await getRestaurantTablesRequest(restaurantId);
+
+            set({
+                tables: response.tables || []
+            });
+        } catch (error) {
+            console.log(error);
+        }
+    },
+
+    createReservation: async (data) => {
+        try {
+            set({
+                loading: true,
+                error: null
+            });
+            const response = await createReservationRequest(data);
+            
+            set((state) => ({
+                reservations: [response.data, ...state.reservations],
+                loading: false
+            }))
+        } catch (error) {
+            set({
+                loading: false,
+                error: error.response?.data?.message || "Error al crear la reservación."
+            })
+        }
+    }
 }));
