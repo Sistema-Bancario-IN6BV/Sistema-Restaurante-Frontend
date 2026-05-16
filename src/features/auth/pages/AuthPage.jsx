@@ -28,9 +28,13 @@ export const AuthPage = () => {
                 <div className="flex flex-col items-center justify-center mb-6">
                     <img 
                         src="/src/assets/img/LogoTipo.png" 
-                        alt="Noir & Grill Logo" 
-                        className="h-32 w-32 rounded-full object-cover drop-shadow-[0_0_15px_rgba(245,200,66,0.15)] mb-2"
+                        alt="kinalEats logo" 
+                        onError={(e) => { e.target.onerror = null; e.target.style.display = 'none' }}
+                        className="h-28 w-28 rounded-full object-cover drop-shadow-[0_0_15px_rgba(245,200,66,0.15)] mb-2 transform transition-transform duration-300 hover:scale-105"
                     />
+                    <div className="mt-2">
+                        <span className="text-xl font-black text-accent drop-shadow-[0_0_6px_rgba(245,200,66,0.35)]">kinalEats</span>
+                    </div>
                 </div>
 
                 <div className="text-center mb-8">
