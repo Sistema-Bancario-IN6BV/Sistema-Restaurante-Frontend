@@ -2,8 +2,8 @@ import { useEffect, useState } from "react"
 import { useOrderStore } from "../orders/store/useOrderStore"
 import { Spinner } from "../../shared/components/layouts/Spinner.jsx"
 import { showError, showSuccess } from "../../shared/utils/toast.js"
-import { CreateOrderModal } from "../orders/components/CreateOrderModal.jsx"
-import { OrderDetailModal } from "../orders/components/OrderDetailModal.jsx"
+import { CreateOrderModal } from "./components/CreateOrderModal.jsx"
+import { OrderDetailModal } from "./components/OrderDetailModal.jsx"
 
 export const OrdersPage = () => {
 
