@@ -1,5 +1,5 @@
 import { create } from "zustand"
-import * as orderApi from "../../../shared/api/orderService"
+import * as orderApi from "../orderService"
 
 export const useOrderStore = create((set, get) => ({
     orders: [],
@@ -9,7 +9,8 @@ export const useOrderStore = create((set, get) => ({
     fetchOrders: async () => {
         set({ loading: true, error: null })
         try {
-            const { orders } = await orderApi.getOrders()
+            const res = await orderApi.getMyOrders()
+            const orders = res?.orders || res || []
             set({ orders, loading: false })
         } catch (err) {
             set({

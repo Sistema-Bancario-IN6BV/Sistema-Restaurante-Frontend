@@ -37,11 +37,11 @@ const menuItemsByRole = {
         { label: "Reportes", to: "/dashboard/reports", icon: ChartPieIcon },
     ],
     CUSTOMER: [
-        { label: "Inicio", to: "/home", icon: HomeIcon },
-        { label: "Restaurantes", to: "/restaurants", icon: BuildingStorefrontIcon },
-        { label: "Mis Reservas", to: "/dashboard/reservations", icon: CalendarDaysIcon },
-        { label: "Mis Pedidos", to: "/dashboard/orders", icon: ShoppingBagIcon },
-        { label: "Mis Facturas", to: "/dashboard/invoices", icon: ReceiptPercentIcon },
+        { label: "Inicio", to: "/customer/home", icon: HomeIcon },
+        { label: "Restaurantes", to: "/customer/restaurants", icon: BuildingStorefrontIcon },
+        { label: "Mis Reservas", to: "/customer/reservations", icon: CalendarDaysIcon },
+        { label: "Mis Pedidos", to: "/customer/orders", icon: ShoppingBagIcon },
+        { label: "Mis Facturas", to: "/customer/invoices", icon: ReceiptPercentIcon },
     ],
 };
 
