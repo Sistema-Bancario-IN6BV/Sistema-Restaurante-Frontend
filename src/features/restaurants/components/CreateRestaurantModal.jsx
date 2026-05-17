@@ -1,6 +1,6 @@
 import { useForm } from "react-hook-form";
-import { useEffect } from "react";
-import { useAuthStore } from "../../auth/store/authStore.js";
+import { useEffect, useMemo, useState } from "react";
+import { getAllUsers } from "../../../shared/api/auth.js";
 import { Spinner } from "../../../shared/components/layouts/Spinner";
 
 const CATEGORY_OPTIONS = [
@@ -35,16 +35,41 @@ export const CreateRestaurantModal = ({
         register,
         handleSubmit,
         reset,
-        setValue,
         formState: { errors },
     } = useForm();
 
-    const currentUser = useAuthStore((s) => s.user);
+    const [admins, setAdmins] = useState([]);
+    const [adminsLoading, setAdminsLoading] = useState(false);
+    const [adminsError, setAdminsError] = useState(null);
 
     useEffect(() => {
-        const id = currentUser?.id || currentUser?._id || currentUser?.userId || currentUser?.sub;
-        if (id) setValue('adminId', id);
-    }, [currentUser, setValue]);
+        if (!isOpen) return;
+
+        const loadAdmins = async () => {
+            setAdminsLoading(true);
+            setAdminsError(null);
+
+            try {
+                const result = await getAllUsers();
+                const users = Array.isArray(result?.users) ? result.users : Array.isArray(result) ? result : [];
+                const adminUsers = users.filter((user) => {
+                    const role = (user?.role || "").toUpperCase();
+                    return role === "RESTAURANT_ADMIN";
+                });
+
+                setAdmins(adminUsers);
+            } catch (error) {
+                setAdminsError(error.response?.data?.message || error.message || "No se pudieron cargar los administradores");
+                setAdmins([]);
+            } finally {
+                setAdminsLoading(false);
+            }
+        };
+
+        loadAdmins();
+    }, [isOpen]);
+
+    const adminOptions = useMemo(() => admins, [admins]);
 
     const validateBeforeSubmit = (values) => {
         if (!values.name) return 'El nombre es requerido';
@@ -280,16 +305,33 @@ export const CreateRestaurantModal = ({
                     {/* Admin y etiquetas */}
                     <div>
                         <label className="block text-sm font-bold text-text-body mb-1.5 uppercase tracking-wide">
-                            ID del Administrador
+                            Administrador asignado
                         </label>
-                        <input
-                            {...register("adminId", { required: "El ID del administrador es obligatorio" })}
-                            type="text"
-                            placeholder="ID del usuario administrador"
-                            className="w-full px-4 py-3 bg-bg-page border border-accent/20 rounded-lg text-text-body focus:outline-none focus:border-accent transition-colors"
-                        />
+                        <select
+                            {...register("adminId", { required: "El administrador es obligatorio" })}
+                            className="w-full px-4 py-3 bg-bg-page border border-accent/20 rounded-lg text-text-body focus:outline-none focus:border-accent transition-colors cursor-pointer"
+                            defaultValue=""
+                            disabled={adminsLoading || adminOptions.length === 0}
+                        >
+                            <option value="">
+                                {adminsLoading
+                                    ? "Cargando administradores..."
+                                    : adminOptions.length === 0
+                                        ? "No hay administradores disponibles"
+                                        : "Selecciona un administrador"}
+                            </option>
+                            {adminOptions.map((admin) => (
+                                <option key={admin.id || admin._id || admin.userId} value={admin.id || admin._id || admin.userId}>
+                                    {[admin.name, admin.surname].filter(Boolean).join(" ") || admin.username || admin.email || admin.id}
+                                    {admin.role ? ` (${admin.role})` : ""}
+                                </option>
+                            ))}
+                        </select>
                         {errors.adminId && (
                             <p className="text-error text-xs font-semibold mt-1">{errors.adminId.message}</p>
+                        )}
+                        {adminsError && (
+                            <p className="text-error text-xs font-semibold mt-1">{adminsError}</p>
                         )}
                     </div>
 

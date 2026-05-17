@@ -100,23 +100,27 @@ export const AvatarUser = () => {
                                 </Link>
                             </li>
                             <div className="border-t border-accent/10 my-1" />
-                            <li>
-                                <Link
-                                    to="/dashboard"
-                                    className="flex items-center gap-2 w-full p-2.5 rounded-lg hover:bg-accent/10 hover:text-accent transition-colors mb-1"
-                                >
-                                    Dashboard
-                                </Link>
-                            </li>
-                            {user?.role === "PLATFORM_ADMIN" && (
-                                <li>
-                                    <Link
-                                        to="/dashboard/users"
-                                        className="block w-full p-2.5 rounded-lg hover:bg-accent/10 hover:text-accent transition-colors mb-2"
-                                    >
-                                        Usuarios
-                                    </Link>
-                                </li>
+                            {(user?.role === "PLATFORM_ADMIN" || user?.role === "RESTAURANT_ADMIN") && (
+                                <>
+                                    <li>
+                                        <Link
+                                            to="/dashboard"
+                                            className="flex items-center gap-2 w-full p-2.5 rounded-lg hover:bg-accent/10 hover:text-accent transition-colors mb-1"
+                                        >
+                                            Dashboard
+                                        </Link>
+                                    </li>
+                                    {user?.role === "PLATFORM_ADMIN" && (
+                                        <li>
+                                            <Link
+                                                to="/dashboard/users"
+                                                className="block w-full p-2.5 rounded-lg hover:bg-accent/10 hover:text-accent transition-colors mb-2"
+                                            >
+                                                Usuarios
+                                            </Link>
+                                        </li>
+                                    )}
+                                </>
                             )}
                             <div className="border-t border-accent/10 my-1" />
                             <li>
