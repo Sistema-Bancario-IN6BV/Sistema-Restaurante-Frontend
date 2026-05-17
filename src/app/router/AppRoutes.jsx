@@ -1,3 +1,5 @@
+import { Orders } from "../../features/orders/components/Orders.jsx";
+import { Invoices } from "../../features/invoices/components/Invoices.jsx";
 import { Routes, Route, Navigate } from "react-router-dom";
 import { AuthPage } from "../../features/auth/pages/AuthPage.jsx";
 import { RequireAuth } from "./RequireAuth.jsx";
@@ -35,6 +37,8 @@ export const AppRoutes = () => {
                 }
             >
                 <Route index element={<DashboardHome />} />
+                <Route path="orders" element={<Orders />} />
+                <Route path="invoices" element={<Invoices />} />
                 <Route path="restaurants" element={<Restaurants />} />
                 <Route path="users" element={<Users />} />
                 <Route path="reservations" element={<Reservations />} />
