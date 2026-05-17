@@ -10,6 +10,7 @@ export const LoginForm = ({ onForgot, onRegister }) => {
     const login = useAuthStore((state) => state.login);
     const loading = useAuthStore((state) => state.loading);
     const error = useAuthStore((state) => state.error);
+    const user = useAuthStore((state) => state.user);
 
     const { register, handleSubmit, formState: { errors } } = useForm();
 
@@ -18,8 +19,11 @@ export const LoginForm = ({ onForgot, onRegister }) => {
         console.log(data);
         const res = await login(data)
         if(res.success){
-            navigate("/dashboard")
-            toast.success("¡Bienvenido a Noir & Grill!", {
+            // Redirigir según rol
+            const role = useAuthStore.getState().user?.role || user?.role
+            if(role === "CUSTOMER") navigate("/customer/home")
+            else navigate("/dashboard")
+            toast.success("¡Bienvenido a kinalEats!", {
                 duration: 2000,
                 style: {
                     background: '#1C1008',
@@ -48,7 +52,7 @@ export const LoginForm = ({ onForgot, onRegister }) => {
                     <input
                         id="emailOrUsername"
                         type="text"
-                        placeholder="usuario@noiregrill.com"
+                        placeholder="usuario@kinaleats.com"
                         className="w-full px-4 py-3 text-sm bg-bg-page border border-text-mid/30 rounded-lg 
                                    focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent 
                                    text-text-dark placeholder:text-text-muted transition-all duration-300 shadow-sm"
@@ -125,8 +129,8 @@ export const LoginForm = ({ onForgot, onRegister }) => {
             <button
                 type="submit"
                 className="w-full bg-bg-dark hover:bg-[#0a0502] text-accent font-semibold py-3.5 px-4 rounded-lg
-                           transition-all duration-300 shadow-md hover:shadow-lg border border-accent/20 
-                           hover:border-accent/40 active:transform active:scale-[0.98] disabled:opacity-70 flex justify-center items-center mt-8 relative overflow-hidden group"
+                               transition-all duration-300 shadow-md hover:shadow-lg border border-accent/20 
+                               hover:border-accent/40 transform hover:scale-105 active:scale-95 disabled:opacity-70 flex justify-center items-center mt-8 relative overflow-hidden group"
                 disabled={loading}
             >
                 <div className="absolute inset-0 bg-accent/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>

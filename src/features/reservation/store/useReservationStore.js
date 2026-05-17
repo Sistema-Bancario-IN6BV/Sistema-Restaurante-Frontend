@@ -1,41 +1,105 @@
 import  { create } from "zustand";
 import { 
-    getReservations as getReservationsRequest,
-    getReservationsForAdmin as getReservationsForAdminRequest 
+    getReservationsForAdmin as getReservationsRequest,
+    cancelReservationRequest,
+    confirmReservationRequest,
+    getRestaurantTables as getRestaurantTablesRequest,
+    createReservation as createReservationRequest
 } from "../../../shared/api/admin";
-import { useAuthStore } from "../../auth/store/authStore";
 
 export const useReservationStore = create((set, get) => ({
     reservations: [],
+    tables: [],
+    reservation: null,
     loading: false,
     error: null,
 
-    getReservations: async (options = { force: false, restaurantId: null }) => {
-        const { force, restaurantId: optRestaurantId } = options;
-        if (get().loading) return;
-        if (!force && get().reservations.length > 0) return;
-
-        set({ loading: true, error: null });
+    getReservationsForAdmin: async () => {
         try {
-            const token = useAuthStore.getState().token;
-            const restaurantId = optRestaurantId ?? null;
-
-            let res;
-            if (restaurantId) {
-                res = await getReservationsRequest(restaurantId, token);
-            } else {
-                res = await getReservationsForAdminRequest(token);
-            }
-
-            const data = res?.data?.data ?? res?.data ?? res;
-            set({ reservations: Array.isArray(data) ? data : [], loading: false });
-            return { success: true, data };
-        } catch (err) {
             set({
-                error: err.response?.data?.message || err.message || "Error al obtener reservaciones",
-                loading: false,
+                loading: true,
+                error: null
             });
-            return { success: false, error: err?.response?.data?.message || err?.message };
+            const response = await getReservationsRequest();
+            console.log(response);
+
+            set({
+                reservations: response.data || [],
+                loading: false
+            })
+
+        } catch (error) {
+            set({
+                error: error.response?.data?.message || "Error al obtener las reservaciones."
+            })
+        }
+    },
+
+    cancelReservation: async (id) => {
+        try {
+
+            const response = await cancelReservationRequest(id);
+
+            set((state) => ({
+                reservations: state.reservations.map((r) =>
+                    r._id === id
+                        ? response.data
+                        : r
+                )
+            }));
+
+        } catch (error) {
+            console.log(error);
+        }
+    },
+
+    confirmReservation: async (id) => {
+        try {
+
+            const response = await confirmReservationRequest(id);
+
+            set((state) => ({
+                reservations: state.reservations.map((r) =>
+                    r._id === id
+                        ? response.data
+                        : r
+                )
+            }));
+
+        } catch (error) {
+            console.log(error);
+        }
+    },
+
+    getRestaurantTables: async (restaurantId) => {
+        try {
+            const response = await getRestaurantTablesRequest(restaurantId);
+
+            set({
+                tables: response.tables || []
+            });
+        } catch (error) {
+            console.log(error);
+        }
+    },
+
+    createReservation: async (data) => {
+        try {
+            set({
+                loading: true,
+                error: null
+            });
+            const response = await createReservationRequest(data);
+            
+            set((state) => ({
+                reservations: [response.data, ...state.reservations],
+                loading: false
+            }))
+        } catch (error) {
+            set({
+                loading: false,
+                error: error.response?.data?.message || "Error al crear la reservación."
+            })
         }
     }
 }));
