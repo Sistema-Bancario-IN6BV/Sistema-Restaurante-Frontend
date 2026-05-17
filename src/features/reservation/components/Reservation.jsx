@@ -1,11 +1,12 @@
-import { useEffect } from "react";
+import { useEffect as useEffectCreate} from "react";
+import { useState, useEffect } from "react";
 import { useReservationStore } from "../store/useReservationStore.js";
 import { Spinner } from "../../../shared/components/layouts/Spinner.jsx";
-import { useEffect as useToastEffect } from "react";
 import { showError } from "../../../shared/utils/toast.js";
 import {
     CheckCircleIcon
 } from "@heroicons/react/24/outline";
+import { CreateReservationModal } from "./createReservationModal.jsx";
 
 import {
     ClockIcon,
@@ -20,15 +21,27 @@ import {
 export const Reservations = () => {
 
     const {
-    reservations,
-    getReservationsForAdmin,
-    cancelReservation,
-    confirmReservation
-} = useReservationStore();
+        reservations,
+        getReservationsForAdmin,
+        cancelReservation,
+        confirmReservation,
+        createReservation
+    } = useReservationStore();
+
+    const [openModal, setOpenModal] = useState(false);
+    
+    const restaurantId = reservations?.[0]?.restaurantId;
 
     useEffect(() => {
         getReservationsForAdmin();
     }, []);
+
+    const handleCreateReservation = async (data) => {
+    const success = await createReservation(data);
+        if (success) {
+            setOpenModal(false);
+        }
+    };
 
     return (
         <div className="p-4">
@@ -48,7 +61,10 @@ export const Reservations = () => {
                 </p>
             </div>
 
-            <button className="bg-accent px-6 py-2 rounded-xl text-bg-dark font-bold hover:bg-gold-light shadow-lg transition flex items-center justify-center gap-2">
+            <button
+                onClick={() => setOpenModal(true)}
+                className="bg-accent px-6 py-2 rounded-xl text-bg-dark font-bold hover:bg-gold-light shadow-lg transition flex items-center justify-center gap-2"
+            >
                 Nueva reserva
             </button>
         </div>
@@ -139,6 +155,12 @@ export const Reservations = () => {
                 ))}
             </div>
         </div>
+        <CreateReservationModal
+            isOpen={openModal}
+            onClose={() => setOpenModal(false)}
+            onSave={handleCreateReservation}
+            restaurantId={restaurantId}
+        />
     </div>
     );
 };

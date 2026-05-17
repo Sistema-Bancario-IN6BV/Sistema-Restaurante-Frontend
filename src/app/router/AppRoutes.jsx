@@ -14,6 +14,7 @@ import { RoleGuard } from "./RoleGuard.jsx";
  
 import { Reservations } from "../../features/reservation/components/Reservation.jsx";
 import { Ingredients } from "../../features/inventory/components/Ingredients.jsx";
+import { Tables } from "../../features/tables/components/Tables.jsx";
 import { Inventory } from "../../features/inventory/components/Inventory.jsx";
 import { Events } from "../../features/events/pages/Events.jsx";
 import { DashboardPage } from "../Layouts/DashboardPage.jsx";
@@ -59,6 +60,7 @@ export const AppRoutes = () => {
                 <Route path="ingredients" element={<Ingredients />} />
                 <Route path="inventory" element={<Inventory />} />
                 <Route path="reports" element={<ReportsPage />} />
+                <Route path="tables" element={<Tables />} />
             </Route>
  
             {/* RUTAS PARA CLIENTES (protegidas por role CUSTOMER) */}

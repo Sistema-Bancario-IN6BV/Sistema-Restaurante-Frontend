@@ -21,3 +21,17 @@ export const confirmReservationRequest = async (id) => {
 
     return data;
 };
+
+/* Para obtener las mesas por restaurante */
+export const getRestaurantTables = async (restaurantId) => {
+    const { data } = await axiosAdmin.get(`/tables/restaurants/${restaurantId}`)
+
+    return data;
+}
+
+export const createReservation = async (reservationData) => {
+    console.log(reservationData);
+    const { data } = await axiosAdmin.post('/reservations/create', reservationData);
+
+    return data;
+}
