@@ -6,6 +6,7 @@ import {
   updateOrderStatus as updateOrderStatusRequest,
   cancelOrder as cancelOrderRequest,
   deleteOrder as deleteOrderRequest,
+  updateOrder as updateOrderRequest,
 } from "../../../shared/api/orders";
 import { createInvoice as createInvoiceRequest } from "../../../shared/api/invoices";
 
@@ -112,7 +113,6 @@ export const useOrderStore = create((set, get) => ({
       set({ loading: true });
 
       const response = await cancelOrderRequest(id);
-
       const updated = response.data.data;
 
       set({
@@ -121,10 +121,13 @@ export const useOrderStore = create((set, get) => ({
         ),
         loading: false,
       });
+
     } catch (error) {
       set({
         loading: false,
-        error: error.response?.data?.message || "Error al cancelar pedido",
+        error:
+          error.response?.data?.message ||
+          "Error al cancelar pedido",
       });
     }
   },
@@ -144,6 +147,28 @@ export const useOrderStore = create((set, get) => ({
         loading: false,
         error: error.response?.data?.message || "Error al eliminar pedido",
       });
+    }
+  },
+
+  updateOrder: async (id, data) => {
+    try {
+      set({ loading: true, error: null });
+
+      const response = await updateOrderRequest(id, data);
+
+      const updated = response.data.data;
+
+      set({
+        orders: get().orders.map((o) => (o._id === id ? updated : o)),
+        loading: false,
+      });
+      return updated;
+    } catch (error) {
+      set({
+        loading: false,
+        error: error.response?.data?.message || "Error al actualizar pedido",
+      });
+      throw error;
     }
   },
 }));
