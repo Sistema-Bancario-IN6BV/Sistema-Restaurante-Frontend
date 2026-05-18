@@ -8,7 +8,7 @@ import { Spinner } from "../../../shared/components/layouts/Spinner.jsx";
 
 import { useOrderStore } from "../store/useOrderStore.js";
 
-import { CreateOrderModal } from "./CreateOrderModal.jsx";
+import { CreateOrderModal } from "../components/CreateOrderModal.jsx";
 
 const PAGE_SIZE = 6;
 

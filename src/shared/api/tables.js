@@ -1,13 +1,3 @@
-<<<<<<< HEAD
-import { axiosAdmin } from "./api";
-
-export const getTablesByRestaurant = (
-  restaurantId
-) =>
-  axiosAdmin.get(
-    `/tables/restaurant/${restaurantId}`
-  );
-=======
 import { axiosAdmin } from "./api.js";
 
 export const getTables = async (params = {}) => {
@@ -51,4 +41,3 @@ export const deactivateTable = async (id) => {
 
     return data;
 };
->>>>>>> 4f12666656d37b95df04aa79798c93ac32c8e115
