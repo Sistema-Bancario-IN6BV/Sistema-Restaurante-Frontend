@@ -23,11 +23,11 @@ export const confirmReservationRequest = async (id) => {
 };
 
 /* Para obtener las mesas por restaurante */
-export const getRestaurantTables = async (restaurantId) => {
-    const { data } = await axiosAdmin.get(`/tables/restaurants/${restaurantId}`)
+export const getRestaurantTables = async () => {
+    const { data } = await axiosAdmin.get('/tables');
 
     return data;
-}
+};
 
 export const createReservation = async (reservationData) => {
     console.log(reservationData);
@@ -35,3 +35,25 @@ export const createReservation = async (reservationData) => {
 
     return data;
 }
+
+export const updateReservation = async (id, reservationData) => {
+    const { data } = await axiosAdmin.put(`/reservations/${id}`, reservationData);
+
+    return data;
+};
+
+export const checkReservationAvailability = async (data) => {
+    const response = await axiosAdmin.post(
+        '/reservations/check-availability',
+        data
+    );
+
+    return response.data;
+};
+
+export const completeReservationRequest = async (id) => {
+    const { data } = await axiosAdmin.patch(
+        `/reservations/${id}/complete`
+    );
+    return data;
+};
