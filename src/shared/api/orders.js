@@ -22,3 +22,6 @@ export const cancelOrder = (id) =>
 
 export const deleteOrder = (id) =>
   axiosAdmin.delete(`/orders/${id}`);
+
+export const updateOrder = (id, data) =>
+  axiosAdmin.patch(`/orders/${id}`, data);

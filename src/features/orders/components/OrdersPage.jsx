@@ -9,6 +9,7 @@ import { Spinner } from "../../../shared/components/layouts/Spinner.jsx";
 import { useOrderStore } from "../store/useOrderStore.js";
 
 import { CreateOrderModal } from "../components/CreateOrderModal.jsx";
+import { EditOrderModal } from "../components/EditOrderModal.jsx";
 
 const PAGE_SIZE = 6;
 
@@ -46,6 +47,9 @@ export const Orders = () => {
   const [openModal, setOpenModal] =
     useState(false);
 
+  const [openEditModal, setOpenEditModal] = useState(false);
+  const [editOrder, setEditOrder] = useState(null);
+
   useEffect(() => {
 
     const loadOrders = async () => {
@@ -78,15 +82,17 @@ export const Orders = () => {
     const value =
       search.toLowerCase();
 
-    return (orders || []).filter(
-      (order) =>
-        order?.status
-          ?.toLowerCase()
-          .includes(value) ||
-        order?.type
-          ?.toLowerCase()
-          .includes(value)
-    );
+    return (orders || [])
+      .filter((order) => order.status !== "CANCELLED")
+      .filter(
+        (order) =>
+          order?.status
+            ?.toLowerCase()
+            .includes(value) ||
+          order?.type
+            ?.toLowerCase()
+            .includes(value)
+      );
 
   }, [orders, search]);
 
@@ -171,6 +177,10 @@ export const Orders = () => {
                 </th>
 
                 <th className="text-left px-6 py-4 uppercase text-xs">
+                  Platos
+                </th>
+
+                <th className="text-left px-6 py-4 uppercase text-xs">
                   Tipo
                 </th>
 
@@ -218,16 +228,16 @@ export const Orders = () => {
 
               ) : (
 
-                paginatedOrders.map(
-                  (order, index) => (
-
-                    <OrderRow
-                      key={order?._id || index}
-                      order={order}
-                    />
-
-                  )
-                )
+                paginatedOrders.map((order, index) => (
+                  <OrderRow
+                    key={order?._id || index}
+                    order={order}
+                    onEdit={(o) => {
+                      setEditOrder(o);
+                      setOpenEditModal(true);
+                    }}
+                  />
+                ))
 
               )}
 
@@ -300,86 +310,89 @@ export const Orders = () => {
         }
       />
 
+      <EditOrderModal
+        isOpen={openEditModal}
+        onClose={() => setOpenEditModal(false)}
+        order={editOrder}
+      />
+
     </div>
   );
 };
 
-const OrderRow = ({
-  order,
-}) => {
-
-  const {
-    updateStatus,
-  } = useOrderStore();
+const OrderRow = ({ order, onEdit }) => {
+  const { updateStatus, cancelOrder } = useOrderStore();
 
   if (!order) return null;
+
+  const handleCancel = async () => {
+    const ok = window.confirm("¿Confirmar cancelar el pedido?");
+    if (!ok) return;
+    try {
+      await cancelOrder(order._id);
+    } catch (e) {}
+  };
 
   return (
     <tr className="border-b border-accent/10 hover:bg-bg-page/20 transition">
 
-      <td className="px-6 py-4 font-medium">
-        #{order?._id?.slice(-6) || "----"}
-      </td>
+      <td className="px-6 py-4 font-medium">#{order?._id?.slice(-6) || "----"}</td>
 
       <td className="px-6 py-4">
-        {order?.type || "Sin tipo"}
+        {(order?.items || []).map((it) => it?.name).filter(Boolean).join(", ") || "Sin platos"}
       </td>
 
-      <td className="px-6 py-4">
+      <td className="px-6 py-4">{order?.type || "Sin tipo"}</td>
 
+      <td className="px-6 py-4">
         <span
           className={`px-3 py-1 rounded-full text-xs font-bold ${
-            statusStyle[order?.status] ||
-            "bg-gray-500/20 text-gray-300"
+            statusStyle[order?.status] || "bg-gray-500/20 text-gray-300"
           }`}
         >
           {order?.status || "SIN ESTADO"}
         </span>
-
       </td>
 
       <td className="px-6 py-4">
-
-        <div className="flex justify-end gap-2 flex-wrap">
+        <div className="flex flex-wrap items-center gap-3 md:justify-end">
 
           <button
-            onClick={() =>
-              updateStatus(
-                order?._id,
-                "PREPARING"
-              )
-            }
-            className="px-3 py-1 rounded-lg bg-yellow-500 text-white text-xs"
+            onClick={() => onEdit && onEdit(order)}
+            className="inline-flex items-center gap-2 rounded-lg bg-bg-page/50 hover:bg-accent/10 border border-accent/20 px-4 py-2 text-xs font-semibold text-accent transition-colors"
+          >
+            Editar
+          </button>
+
+          <button
+            onClick={handleCancel}
+            className="inline-flex items-center gap-2 rounded-lg border border-error/30 bg-error/5 hover:bg-error/10 px-4 py-2 text-xs font-semibold text-error transition-colors"
+          >
+            Cancelar
+          </button>
+
+          <button
+            onClick={() => updateStatus(order?._id, "PREPARING")}
+            className="inline-flex items-center gap-2 rounded-lg border border-yellow-500/30 bg-yellow-500/10 hover:bg-yellow-500/20 px-4 py-2 text-xs font-semibold text-yellow-600 transition-colors"
           >
             Preparando
           </button>
 
           <button
-            onClick={() =>
-              updateStatus(
-                order?._id,
-                "READY"
-              )
-            }
-            className="px-3 py-1 rounded-lg bg-blue-500 text-white text-xs"
+            onClick={() => updateStatus(order?._id, "READY")}
+            className="inline-flex items-center gap-2 rounded-lg border border-blue-500/30 bg-blue-500/10 hover:bg-blue-500/20 px-4 py-2 text-xs font-semibold text-blue-600 transition-colors"
           >
             Listo
           </button>
 
           <button
-            onClick={() =>
-              updateStatus(
-                order?._id,
-                "DELIVERED"
-              )
-            }
-            className="px-3 py-1 rounded-lg bg-green-600 text-white text-xs"
+            onClick={() => updateStatus(order?._id, "DELIVERED")}
+            className="inline-flex items-center gap-2 rounded-lg border border-green-500/30 bg-green-500/10 hover:bg-green-500/20 px-4 py-2 text-xs font-semibold text-green-600 transition-colors"
           >
             Entregado
           </button>
 
         </div>
-
       </td>
 
     </tr>
