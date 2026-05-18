@@ -1,20 +1,21 @@
 import { useEffect, useState } from "react";
 
 import { useReservationStore } from "../store/useReservationStore.js";
+import { useSaveReservation } from "../hooks/useSaveReservation.jsx";
+import { checkReservationAvailability } from "../../../shared/api/admin";
+
 import { Spinner } from "../../../shared/components/layouts/Spinner";
 
 export const CreateReservationModal = ({
     isOpen,
     onClose,
-    onSave,
-    restaurantId,
-    loading
+    reservation,
+    restaurantId
 }) => {
 
-    const {
-        tables,
-        getRestaurantTables
-    } = useReservationStore();
+    const { tables, getRestaurantTables, loading } = useReservationStore();
+
+    const { saveReservation } = useSaveReservation();
 
     const [form, setForm] = useState({
         tableId: "",
@@ -25,29 +26,105 @@ export const CreateReservationModal = ({
     });
 
     const [error, setError] = useState("");
+    const [dateError, setDateError] = useState("");
+    const [backendError, setBackendError] = useState("");
+    const [serverError, setServerError] = useState("");
 
-    // obtememos mesas por restaurante
     useEffect(() => {
-        if (isOpen && restaurantId) {
-            getRestaurantTables(restaurantId);
+        if (isOpen) {
+            getRestaurantTables();
         }
-    }, [isOpen, restaurantId]);
+    }, [isOpen]);
 
-    // seleccionamos la mesa
+    useEffect(() => {
+        if (reservation) {
+            setForm({
+                tableId:
+                    reservation.tableId?._id || "",
+                date: reservation.date
+                    ? reservation.date.split("T")[0]
+                    : "",
+                time: reservation.time || "",
+                guests: reservation.guests || 1,
+                notes: reservation.notes || ""
+            });
+        } else {
+            setForm({
+                tableId: "",
+                date: "",
+                time: "",
+                guests: 1,
+                notes: ""
+            });
+        }
+    }, [reservation, isOpen]);
+
     const selectedTable = tables.find(
         (table) => table._id === form.tableId
     );
 
-    // validamos la capacidad de la mesa, oh si
     useEffect(() => {
-        if ( selectedTable && Number(form.guests) > selectedTable.capacity ) {
-            setError(`La mesa solo admite ${selectedTable.capacity} personas`);
+        if (
+            selectedTable &&
+            Number(form.guests) >
+            selectedTable.capacity
+        ) {
+            setError(
+                `La mesa solo admite ${selectedTable.capacity} personas`
+            );
         } else {
             setError("");
         }
     }, [form.guests, form.tableId]);
 
+    useEffect(() => {
+        const checkAvailability = async () => {
+            if (
+                !form.tableId ||
+                !form.date ||
+                !form.time
+            ) {
+                return;
+            }
+
+            try {
+                setBackendError("");
+                
+                await checkReservationAvailability({
+                    tableId: form.tableId,
+                    date: form.date,
+                    time: form.time,
+                    reservationId: reservation?._id
+                });
+            } catch (error) {
+                setBackendError(
+                    error.response?.data?.message
+                );
+            }
+        };
+        checkAvailability();
+    }, [form.tableId, form.date, form.time]);
+
+    useEffect(() => {
+        if (!form.date || !form.time) {
+            setDateError("");
+            return;
+        }
+
+        const now = new Date();
+
+        const selectedDateTime = new Date(`${form.date}T${form.time}` );
+
+        if (selectedDateTime < now) {
+            setDateError("No puedes crear reservaciones en fechas u horas pasadas");
+        } else {
+            setDateError("");
+        }
+    }, [form.date, form.time]);
+
     const handleChange = (e) => {
+        setBackendError("");
+        
         setForm({
             ...form,
             [e.target.name]: e.target.value
@@ -57,23 +134,22 @@ export const CreateReservationModal = ({
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        if (error) return;
-        await onSave({
-            restaurant: restaurantId,
-            table: form.tableId,
-            reservationDate: form.date,
-            time: form.time,
-            guests: form.guests,
-            notes: form.notes
-        });
+        setServerError("");
 
-        setForm({
-            tableId: "",
-            date: "",
-            time: "",
-            guests: 1,
-            notes: ""
-        });
+        if (error || dateError || backendError) return;
+
+        const result = await saveReservation(
+            { ...form, restaurantId },
+            reservation?._id
+        );
+
+        if (result?.error) {
+            setServerError(result.error);
+            return;
+        }
+
+        await getRestaurantTables();
+
         onClose();
     };
 
@@ -82,14 +158,19 @@ export const CreateReservationModal = ({
     return (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex justify-center items-center z-50 px-3 sm:px-4">
             <div className="bg-[#f6f1e8] rounded-2xl shadow-2xl border border-accent/20 w-full max-w-3xl max-h-[90vh] flex flex-col overflow-hidden">
+                
                 {/* HEADER */}
                 <div className="p-4 sm:p-5 text-bg-dark sticky top-0 z-10 bg-accent">
                     <h2 className="text-xl sm:text-2xl font-bold font-serif">
-                        Nueva Reservación
+                        {
+                            reservation
+                                ? "Editar Reservación"
+                                : "Nueva Reservación"
+                        }
                     </h2>
 
                     <p className="text-xs sm:text-sm font-semibold opacity-90 mt-1">
-                        Completa la información para registrar una nueva reservación
+                        Completa la información
                     </p>
                 </div>
 
@@ -109,26 +190,28 @@ export const CreateReservationModal = ({
                             value={form.tableId}
                             onChange={handleChange}
                             required
-                            className="w-full px-4 py-3 bg-bg-page border border-accent/20 rounded-lg text-text-body focus:outline-none focus:border-accent transition-colors cursor-pointer"
+                            className="w-full px-4 py-3 bg-bg-page border border-accent/20 rounded-lg"
                         >
+
                             <option value="">
                                 Selecciona una mesa
                             </option>
 
-                            {tables.map((table) => (
-                                <option
-                                    key={table._id}
-                                    value={table._id}
-                                >
-                                    Mesa {table.number} | Capacidad de: {table.capacity} personas
-                                </option>
+                            {tables
+                                .sort((a, b) => Number(a.number) - Number(b.number))
+                                .map((table) => (
+                                    <option
+                                        key={table._id}
+                                        value={table._id}
+                                    >
+                                        Mesa {table.number} - {table.capacity} personas
+                                    </option>
                             ))}
                         </select>
                     </div>
 
                     {/* FECHA Y HORA */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {/* FECHA */}
                         <div>
                             <label className="block text-sm font-bold text-text-body mb-1.5 uppercase tracking-wide">
                                 Fecha
@@ -140,11 +223,15 @@ export const CreateReservationModal = ({
                                 value={form.date}
                                 onChange={handleChange}
                                 required
-                                className="w-full px-4 py-3 bg-bg-page border border-accent/20 rounded-lg text-text-body focus:outline-none focus:border-accent transition-colors"
+                                className="w-full px-4 py-3 bg-bg-page border border-accent/20 rounded-lg"
                             />
+                            {dateError && (
+                                <p className="text-error text-xs font-semibold mt-1">
+                                    {dateError}
+                                </p>
+                            )}
                         </div>
 
-                        {/* HORA */}
                         <div>
                             <label className="block text-sm font-bold text-text-body mb-1.5 uppercase tracking-wide">
                                 Hora
@@ -156,7 +243,7 @@ export const CreateReservationModal = ({
                                 value={form.time}
                                 onChange={handleChange}
                                 required
-                                className="w-full px-4 py-3 bg-bg-page border border-accent/20 rounded-lg text-text-body focus:outline-none focus:border-accent transition-colors"
+                                className="w-full px-4 py-3 bg-bg-page border border-accent/20 rounded-lg"
                             />
                         </div>
                     </div>
@@ -174,13 +261,16 @@ export const CreateReservationModal = ({
                             value={form.guests}
                             onChange={handleChange}
                             required
-                            placeholder="Número de invitados"
-                            className="w-full px-4 py-3 bg-bg-page border border-accent/20 rounded-lg text-text-body focus:outline-none focus:border-accent transition-colors"
+                            className="w-full px-4 py-3 bg-bg-page border border-accent/20 rounded-lg"
                         />
 
                         {selectedTable && (
                             <p className="text-xs font-semibold text-text-muted mt-1">
-                                Capacidad máxima: {selectedTable.capacity} personas
+                                Capacidad máxima:
+                                {" "}
+                                {selectedTable.capacity}
+                                {" "}
+                                personas
                             </p>
                         )}
 
@@ -196,21 +286,24 @@ export const CreateReservationModal = ({
                         <label className="block text-sm font-bold text-text-body mb-1.5 uppercase tracking-wide">
                             Notas
                         </label>
-
                         <textarea
                             name="notes"
                             rows="4"
                             value={form.notes}
                             onChange={handleChange}
-                            placeholder="Observaciones o detalles..."
-                            className="w-full px-4 py-3 bg-bg-page border border-accent/20 rounded-lg text-text-body focus:outline-none focus:border-accent transition-colors resize-none"
+                            className="w-full px-4 py-3 bg-bg-page border border-accent/20 rounded-lg resize-none"
                         />
                     </div>
 
-                    {/* ERROR */}
-                    {error && (
+                    {backendError && (
                         <p className="text-error text-sm font-bold text-center">
-                            {error}
+                            {backendError}
+                        </p>
+                    )}
+
+                    {serverError && (
+                        <p className="text-error text-sm font-bold text-center">
+                            {serverError}
                         </p>
                     )}
 
@@ -219,22 +312,23 @@ export const CreateReservationModal = ({
                         <button
                             type="button"
                             onClick={onClose}
-                            className="w-full sm:w-auto px-6 py-3 rounded-xl border border-accent/20 bg-bg-page hover:bg-accent/10 text-text-body font-bold transition-colors"
+                            className="w-full sm:w-auto px-6 py-3 rounded-xl border border-accent/20 bg-bg-page"
                         >
                             Cancelar
                         </button>
 
                         <button
                             type="submit"
-                            disabled={loading || !!error}
-                            className="w-full sm:w-auto px-6 py-3 rounded-xl bg-accent text-bg-dark font-bold hover:bg-gold-light transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center gap-2"
+                            disabled={ loading || !!error || !!dateError || !!backendError }
+                            className="w-full sm:w-auto px-6 py-3 rounded-xl bg-accent text-bg-dark font-bold"
                         >
-
-                            {loading ? (
-                                <Spinner />
-                            ) : (
-                                "Crear reservación"
-                            )}
+                            {
+                                loading
+                                    ? <Spinner />
+                                    : reservation
+                                        ? "Guardar cambios"
+                                        : "Crear reservación"
+                            }
                         </button>
                     </div>
                 </form>
