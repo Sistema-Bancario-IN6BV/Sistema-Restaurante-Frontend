@@ -49,20 +49,27 @@ export const Orders = () => {
   useEffect(() => {
 
     const loadOrders = async () => {
-
       try {
-
         await getOrders();
-
       } catch (error) {
-
         console.log(error);
-
       }
-
     };
 
     loadOrders();
+
+    // Start realtime polling
+    if (typeof window !== 'undefined') {
+      try {
+        useOrderStore.getState().startRealtime();
+      } catch (e) {}
+    }
+
+    return () => {
+      try {
+        useOrderStore.getState().stopRealtime();
+      } catch (e) {}
+    };
 
   }, []);
 

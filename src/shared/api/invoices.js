@@ -1,8 +1,12 @@
 import { axiosAdmin } from "./api";
+
+export const createInvoice = (orderId) =>
+  axiosAdmin.post("/invoices", { orderId });
+
 export const getMyInvoices = () =>
-  api.get("/invoices/my");
+  axiosAdmin.get("/invoices/my");
 
 export const payInvoice = (id, paymentMethod) =>
-  api.patch(`/invoices/${id}/pay`, {
+  axiosAdmin.patch(`/invoices/${id}/pay`, {
     paymentMethod,
   });
