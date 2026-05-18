@@ -1,3 +1,5 @@
+import { Orders } from "../../features/orders/components/OrdersPage.jsx";
+import { Invoices } from "../../features/invoices/components/Invoices.jsx";
 import { Routes, Route, Navigate } from "react-router-dom";
 import { AuthPage } from "../../features/auth/pages/AuthPage.jsx";
 import { RequireAuth } from "./RequireAuth.jsx";
@@ -20,7 +22,7 @@ import { Events } from "../../features/events/pages/Events.jsx";
 import { DashboardPage } from "../Layouts/DashboardPage.jsx";
 import { ReportsPage } from "../../features/dashboard/pages/ReportsPage.jsx";
 import { HomePage } from "../../features/home/pages/HomePage.jsx";
-import { OrdersPage } from "../../features/orders/OrdersPage.jsx";
+// orders component
 import { InvoicesPage } from "../../features/invoices/pages/InvoicesPage.jsx";
 
 export const AppRoutes = () => {
@@ -51,6 +53,8 @@ export const AppRoutes = () => {
                 }
             >
                 <Route index element={<DashboardHome />} />
+                <Route path="orders" element={<Orders />} />
+                <Route path="invoices" element={<Invoices />} />
                 <Route path="restaurants" element={<Restaurants />} />
                 <Route path="restaurants/:restaurantId/menu-items" element={<MenuItems />} />
                 <Route path="menu-items" element={<MenuItems />} />
@@ -79,7 +83,7 @@ export const AppRoutes = () => {
                 <Route path="restaurants" element={<Restaurants />} />
                 <Route path="menu" element={<MenuItems />} />
                 <Route path="reservations" element={<Reservations />} />
-                <Route path="orders" element={<OrdersPage />} />
+                <Route path="orders" element={<Orders />} />
                 <Route path="invoices" element={<InvoicesPage />} />
             </Route>
 
