@@ -1,6 +1,6 @@
 import { Orders } from "../../features/orders/components/OrdersPage.jsx";
 import { Invoices } from "../../features/invoices/components/Invoices.jsx";
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate, Outlet } from "react-router-dom";
 import { AuthPage } from "../../features/auth/pages/AuthPage.jsx";
 import { RequireAuth } from "./RequireAuth.jsx";
 import { Profile } from "../../features/users/pages/Profile.jsx";
@@ -24,6 +24,9 @@ import { ReportsPage } from "../../features/dashboard/pages/ReportsPage.jsx";
 import { HomePage } from "../../features/home/pages/HomePage.jsx";
 // orders component
 import { InvoicesPage } from "../../features/invoices/pages/InvoicesPage.jsx";
+
+// vista customers
+import { UserReservation } from "../../features/reservation/userReservation/components/UserReservation.jsx";
 
 export const AppRoutes = () => {
     return (
@@ -73,7 +76,7 @@ export const AppRoutes = () => {
                 element={
                     <ProtectedRoute>
                         <RoleGuard allowedRole={["CUSTOMER"]}>
-                            <div />
+                            <Outlet />
                         </RoleGuard>
                     </ProtectedRoute>
                 }
@@ -82,7 +85,7 @@ export const AppRoutes = () => {
                 <Route path="home" element={<HomePage />} />
                 <Route path="restaurants" element={<Restaurants />} />
                 <Route path="menu" element={<MenuItems />} />
-                <Route path="reservations" element={<Reservations />} />
+                <Route path="reservations" element={<UserReservation />} />
                 <Route path="orders" element={<Orders />} />
                 <Route path="invoices" element={<InvoicesPage />} />
             </Route>
