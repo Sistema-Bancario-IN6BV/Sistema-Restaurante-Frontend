@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import {useUserRestaurantStore} from "../store/useUserRestaurantStore";
-import {useSaveUserReservation} from "../hooks/useSaveUserReservation";
+import {useSaveUserReservations} from "../hooks/useSaveUserReservations";
 
 import {
     XMarkIcon
@@ -22,7 +22,7 @@ export const CreateUserRestaurantModal = ({isOpen, onClose, restaurant}) => {
         notes: ""
     });
 
-    const {saveReservation} = useSaveUserReservation();
+    const {saveReservation} = useSaveUserReservations();
 
     const [error, setError] = useState("");
 
