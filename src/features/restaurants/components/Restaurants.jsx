@@ -76,24 +76,15 @@ const formatCurrency = (value) => {
 
 
 
+import { resolveImageUrl } from "../../../shared/utils/imageUrl.js";
+
 const restaurantCoverUrl = (path) => {
 	if (!path) return null;
 	const value = typeof path === "object"
 		? path.secure_url || path.url || path.path || path.location || path.filename || null
 		: path;
 	if (!value) return null;
-	const raw = String(value).trim();
-	// Absolute URLs with protocol
-	if (raw.startsWith("http://") || raw.startsWith("https://")) return raw;
-	// Protocol-relative URLs (//res.cloudinary.com/...)
-	if (raw.startsWith("//")) return `https:${raw}`;
-	// If it already contains cloudinary domain without protocol
-	if (raw.includes("res.cloudinary.com")) return `https://${raw.replace(/^\/+/, "")}`;
-
-	const cloudinaryBase = import.meta.env.VITE_CLOUDINARY_BASE_URL || "https://res.cloudinary.com/db5rnorf/image/upload/";
-	const url = `${cloudinaryBase}${raw.replace(/^\/+/, "")}`;
-	try { console.debug("resolved cover url:", url); } catch (e) {}
-	return url;
+	return resolveImageUrl(value);
 };
 
 const getRestaurantAdminId = (restaurant) =>
@@ -160,6 +151,7 @@ export const Restaurants = () => {
 		setError(null);
 
 		try {
+			console.log('[Restaurants] fetchRestaurants', { force });
 			const response = await axiosAdmin.get("/restaurants/get");
 			const restaurantList = normalizeRestaurants(response.data);
 			setRestaurants(restaurantList);
@@ -173,6 +165,7 @@ export const Restaurants = () => {
 	}, []);
 
 	useEffect(() => {
+		console.log('[Restaurants] mounted');
 		fetchRestaurants();
 	}, [fetchRestaurants]);
 
@@ -396,7 +389,15 @@ export const Restaurants = () => {
 								<div key={restaurant.id || restaurant._id} className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition">
 									<div className="w-full h-44 bg-gray-100 relative">
 										{cover ? (
-											<img src={cover} alt={restaurant.name || "Portada"} className="w-full h-full object-cover" />
+											<img
+												src={cover}
+												alt={restaurant.name || "Portada"}
+												className="w-full h-full object-cover"
+												onError={(e) => {
+													console.debug('Image load failed for restaurant', { raw: restaurant.image || restaurant.photo || restaurant.cover || restaurant.imagePath || restaurant.imageUrl, resolved: cover });
+													e.currentTarget.style.display = 'none';
+												}}
+											/>
 										) : (
 											<div className="w-full h-full flex items-center justify-center text-text-muted">Sin portada</div>
 										)}
@@ -420,12 +421,31 @@ export const Restaurants = () => {
 											<div className="text-right text-xs text-text-muted">{formatCurrency(restaurant.avgPrice)}</div>
 										</div>
 										<p className="text-xs text-text-muted mt-2">Administrador: <span className="font-semibold text-text-body">{getRestaurantAdminName(restaurant, adminMap)}</span></p>
-										<div className="mt-4 flex justify-end">
+										<div className="mt-4 flex gap-2 justify-end">
 											<button
 												className="px-3 py-1 rounded-lg bg-bg-page/50 hover:bg-accent/10 border border-accent/20 text-accent text-xs font-semibold transition-colors"
 												onClick={() => handleOpenDetail(restaurant)}
 											>
-												Ver detalles
+												Editar
+											</button>
+											<button
+												className="px-3 py-1 rounded-lg bg-error/10 hover:bg-error/20 border border-error/20 text-error text-xs font-semibold transition-colors"
+												onClick={async () => {
+													if (!confirm('¿Está seguro de eliminar este restaurante?')) return;
+													try {
+														setLoading(true);
+														await axiosAdmin.delete(`/restaurants/${restaurant.id || restaurant._id}`);
+														showSuccess('Restaurante eliminado correctamente');
+														await fetchRestaurants(true);
+													} catch (err) {
+														const message = err.response?.data?.message || err.message || 'Error al eliminar restaurante';
+														showError(message);
+													} finally {
+														setLoading(false);
+													}
+												}}
+											>
+												Eliminar
 											</button>
 										</div>
 									</div>

@@ -22,10 +22,7 @@ import { Events } from "../../features/events/pages/Events.jsx";
 import { DashboardPage } from "../Layouts/DashboardPage.jsx";
 import { ReportsPage } from "../../features/dashboard/pages/ReportsPage.jsx";
 import { HomePage } from "../../features/home/pages/HomePage.jsx";
-// orders component
 import { InvoicesPage } from "../../features/invoices/pages/InvoicesPage.jsx";
-
-// vista customers
 import { UserReservation } from "../../features/reservation/userReservation/components/UserReservation.jsx";
 import { UserRestaurant } from "../../features/restaurants/userRestaurants/components/UserRestaurant.jsx";
 
@@ -86,6 +83,7 @@ export const AppRoutes = () => {
                 <Route path="home" element={<HomePage />} />
                 <Route path="restaurants" element={<UserRestaurant />} />
                 <Route path="menu" element={<MenuItems />} />
+                <Route path="menu/:restaurantId" element={<MenuItems />} />
                 <Route path="reservations" element={<UserReservation />} />
                 <Route path="orders" element={<Orders />} />
                 <Route path="invoices" element={<InvoicesPage />} />
@@ -95,4 +93,3 @@ export const AppRoutes = () => {
         </Routes>
     );
 };
- 
