@@ -12,3 +12,21 @@ export const cancelMyReservationRequest = async (id) => {
 
     return data;
 };
+
+export const createReservationRequest = async (reservationData) => {
+    const { data } = await axiosAdmin.post("/reservations/create", reservationData);
+
+    return data;
+};
+
+export const getRestaurantsRequest = async () => {
+    const { data } = await axiosAdmin.get("/restaurants/get");
+
+    return data;
+};
+
+export const getRestaurantTablesRequest = async (restaurantId) => {
+    const { data } = await axiosAdmin.get(`/restaurants/restaurant/${restaurantId}`);
+
+    return data;
+};

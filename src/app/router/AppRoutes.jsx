@@ -27,6 +27,7 @@ import { InvoicesPage } from "../../features/invoices/pages/InvoicesPage.jsx";
 
 // vista customers
 import { UserReservation } from "../../features/reservation/userReservation/components/UserReservation.jsx";
+import { UserRestaurant } from "../../features/restaurants/userRestaurants/components/UserRestaurant.jsx";
 
 export const AppRoutes = () => {
     return (
@@ -83,7 +84,7 @@ export const AppRoutes = () => {
             >
                 <Route index element={<HomePage />} />
                 <Route path="home" element={<HomePage />} />
-                <Route path="restaurants" element={<Restaurants />} />
+                <Route path="restaurants" element={<UserRestaurant />} />
                 <Route path="menu" element={<MenuItems />} />
                 <Route path="reservations" element={<UserReservation />} />
                 <Route path="orders" element={<Orders />} />
