@@ -83,7 +83,11 @@ export const Orders = () => {
       search.toLowerCase();
 
     return (orders || [])
-      .filter((order) => order.status !== "CANCELLED")
+      .filter(
+        (order) =>
+          order.status !== "CANCELLED" &&
+          order.status !== "DELIVERED"
+      )
       .filter(
         (order) =>
           order?.status
@@ -342,7 +346,17 @@ const OrderRow = ({ order, onEdit }) => {
         {(order?.items || []).map((it) => it?.name).filter(Boolean).join(", ") || "Sin platos"}
       </td>
 
-      <td className="px-6 py-4">{order?.type || "Sin tipo"}</td>
+      <td className="px-6 py-4">
+        <div className="flex flex-col">
+          <span>{order?.type || "Sin tipo"}</span>
+
+          {order?.tableId?.number && (
+            <span className="text-xs text-text-muted">
+              Mesa #{order.tableId.number}
+            </span>
+          )}
+        </div>
+      </td>
 
       <td className="px-6 py-4">
         <span
