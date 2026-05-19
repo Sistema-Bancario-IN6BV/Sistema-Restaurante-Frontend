@@ -289,7 +289,7 @@ export const Reservations = () => {
                                         className="inline-flex items-center gap-2 rounded-lg bg-bg-page/50 hover:bg-accent/10 border border-accent/20 px-4 py-2 text-xs font-semibold text-accent transition-colors"
                                     >
                                         <PencilSquareIcon className="h-4 w-4" />
-                                        Editar
+                                        Editar / Ver
                                     </button>
                                 )}
 

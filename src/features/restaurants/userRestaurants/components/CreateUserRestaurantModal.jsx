@@ -1,23 +1,16 @@
 import { useEffect, useState } from "react";
+import {useUserRestaurantStore} from "../store/useUserRestaurantStore";
+import {useSaveUserReservation} from "../hooks/useSaveUserReservation";
 
 import {
     XMarkIcon
 } from "@heroicons/react/24/outline";
 
-import {
-    useUserRestaurantStore
-} from "../store/useUserRestaurantStore";
-
-export const CreateUserRestaurantModal = ({
-    isOpen,
-    onClose,
-    restaurant
-}) => {
+export const CreateUserRestaurantModal = ({isOpen, onClose, restaurant}) => {
 
     const {
         tables,
         getRestaurantTables,
-        createReservation,
         loading
     } = useUserRestaurantStore();
 
@@ -29,10 +22,11 @@ export const CreateUserRestaurantModal = ({
         notes: ""
     });
 
+    const {saveReservation} = useSaveUserReservation();
+
     const [error, setError] = useState("");
 
     useEffect(() => {
-
         if (
             isOpen &&
             restaurant?._id
@@ -41,59 +35,41 @@ export const CreateUserRestaurantModal = ({
                 restaurant._id
             );
         }
-
     }, [isOpen, restaurant]);
 
-    const selectedTable = tables.find(
-        (table) =>
-            table._id === form.table
-    );
+    const selectedTable = tables.find((table) => table._id === form.table);
 
     useEffect(() => {
-
         if (
             selectedTable &&
             Number(form.guests) >
                 selectedTable.capacity
         ) {
-
             setError(
                 `La mesa solo admite ${selectedTable.capacity} personas`
             );
-
         } else {
-
             setError("");
         }
-
     }, [form.guests, form.table]);
 
     if (!isOpen) return null;
 
     const handleSubmit = async (e) => {
-
         e.preventDefault();
 
         if (error) return;
 
-        const response =
-            await createReservation({
-                restaurant:
-                    restaurant._id,
-                table:
-                    form.table,
-                reservationDate:
-                    form.reservationDate,
-                time:
-                    form.time,
-                guests:
-                    Number(form.guests),
-                notes:
-                    form.notes
-            });
+        const result = await saveReservation({
+            restaurant: restaurant._id,
+            table: form.table,
+            reservationDate: form.reservationDate,
+            time: form.time,
+            guests: form.guests,
+            notes: form.notes
+        });
 
-        if (response?.success) {
-
+        if (result.success) {
             alert(
                 "Reservación creada correctamente"
             );
@@ -107,12 +83,9 @@ export const CreateUserRestaurantModal = ({
             });
 
             onClose();
-
         } else {
-
             alert(
-                response?.message ||
-                "Error al crear reservación"
+                result.error
             );
         }
     };
