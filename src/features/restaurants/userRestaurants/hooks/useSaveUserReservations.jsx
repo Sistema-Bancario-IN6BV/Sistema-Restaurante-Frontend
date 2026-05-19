@@ -2,7 +2,7 @@ import {
     useUserRestaurantStore
 } from "../store/useUserRestaurantStore";
 
-export const useSaveUserReservation = () => {
+export const useSaveUserReservations = () => {
 
     const createReservation = useUserRestaurantStore((state) => state.createReservation);
 
