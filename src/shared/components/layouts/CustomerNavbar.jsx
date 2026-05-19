@@ -17,7 +17,6 @@ import {
 import { useState } from "react";
 
 const customerMenu = [
-  { label: "Inicio", to: "/customer/home", icon: HomeIcon },
   { label: "Restaurantes", to: "/customer/restaurants", icon: BuildingStorefrontIcon },
   { label: "Menú", to: "/customer/menu", icon: BookOpenIcon },
   { label: "Mis Reservas", to: "/customer/reservations", icon: CalendarDaysIcon },
@@ -85,7 +84,6 @@ export const CustomerNavbar = () => {
               <div className="hidden sm:flex items-center">
                 <CartBadge />
               </div>
-              <MessagesBadge />
               <AvatarUser />
             </>
           )}

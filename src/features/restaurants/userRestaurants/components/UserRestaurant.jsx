@@ -140,7 +140,7 @@ export const UserRestaurant = () => {
                                 <button
                                     className="flex-1 rounded-xl border border-yellow-500 px-3 py-2 text-sm font-semibold text-yellow-600 hover:bg-yellow-50 transition"
                                 >
-                                    Menú
+                                    Ir a Menú
                                 </button>
                             </div>
                         </div>
