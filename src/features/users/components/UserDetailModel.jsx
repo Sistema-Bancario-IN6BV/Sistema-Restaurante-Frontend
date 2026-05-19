@@ -24,7 +24,7 @@ export const UserDetailModal = ({
 
         const cloudinaryBase =
             import.meta.env.VITE_CLOUDINARY_BASE_URL ||
-            "https://res.cloudinary.com/db5rnorf/image/upload/";
+            "https://res.cloudinary.com/db5rnorif/image/upload/";
 
         return `${cloudinaryBase}${value.replace(/^\/+/, "")}`;
     })();
@@ -60,7 +60,7 @@ export const UserDetailModal = ({
                             alt={user.username}
                             className="w-16 h-16 rounded-full object-cover border-2 border-accent"
                             onError={(e) => {
-                                e.currentTarget.onError = null;
+                                e.currentTarget.onerror = null;
                                 e.currentTarget.src = defaultAvatarImg;
                             }}
                         />

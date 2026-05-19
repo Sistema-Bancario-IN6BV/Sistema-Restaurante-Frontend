@@ -22,6 +22,7 @@ import { Events } from "../../features/events/pages/Events.jsx";
 import { DashboardPage } from "../Layouts/DashboardPage.jsx";
 import { ReportsPage } from "../../features/dashboard/pages/ReportsPage.jsx";
 import { HomePage } from "../../features/home/pages/HomePage.jsx";
+import { CustomerRestaurants } from "../../features/restaurants/components/CustomerRestaurants.jsx";
 // orders component
 import { InvoicesPage } from "../../features/invoices/pages/InvoicesPage.jsx";
 
@@ -83,8 +84,9 @@ export const AppRoutes = () => {
             >
                 <Route index element={<HomePage />} />
                 <Route path="home" element={<HomePage />} />
-                <Route path="restaurants" element={<Restaurants />} />
+                <Route path="restaurants" element={<CustomerRestaurants />} />
                 <Route path="menu" element={<MenuItems />} />
+                <Route path="menu/:restaurantId" element={<MenuItems />} />
                 <Route path="reservations" element={<UserReservation />} />
                 <Route path="orders" element={<Orders />} />
                 <Route path="invoices" element={<InvoicesPage />} />

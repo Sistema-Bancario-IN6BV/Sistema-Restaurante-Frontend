@@ -28,11 +28,24 @@ axiosAuth.interceptors.request.use((config) => {
 
 // Interceptor para axiosAdmin
 axiosAdmin.interceptors.request.use((config) => {
+    const isFormData = typeof FormData !== "undefined" && config.data instanceof FormData;
+
+    if (isFormData) {
+        // Let the browser set multipart boundary automatically.
+        if (config.headers) {
+            delete config.headers["Content-Type"];
+            delete config.headers["content-type"];
+        }
+    }
+
     const token = useAuthStore.getState().token;
     if (token) {
         config.headers = config.headers || {};
         config.headers.Authorization = `Bearer ${token}`;
     }
+    try {
+        console.log('[axiosAdmin] request ->', config.method, config.baseURL + config.url, { headers: config.headers });
+    } catch (e) {}
     return config;
 });
 
