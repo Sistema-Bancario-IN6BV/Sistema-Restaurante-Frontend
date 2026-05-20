@@ -416,31 +416,7 @@ export const InvoicesPage = () => {
                   </h3>
                 </div>
 
-                {user?.role === 'CUSTOMER' && (
-                  <button
-                    onClick={async () => {
-                      const ok = window.confirm('¿Eliminar esta factura? Esta acción no se puede deshacer.');
-                      if (!ok) return;
-                      try {
-                        await deleteInvoice(invoice._id);
-                      } catch (err) {
-                        alert('Error al eliminar la factura');
-                      }
-                    }}
-                    className="
-                      bg-red-600
-                      hover:bg-red-700
-                      text-white
-                      px-5
-                      py-2
-                      rounded-xl
-                      font-semibold
-                      transition-all
-                    "
-                  >
-                    Eliminar
-                  </button>
-                )}
+                {/* Delete button removed per request */}
 
                 <button
                   onClick={() => handlePrint(invoice)}

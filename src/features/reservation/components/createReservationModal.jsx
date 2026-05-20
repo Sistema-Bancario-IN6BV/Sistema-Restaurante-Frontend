@@ -122,6 +122,11 @@ export const CreateReservationModal = ({
         }
     }, [form.date, form.time]);
 
+    // Si el usuario cambia la fecha, limpiar la hora para obligar a elegir una nueva
+    useEffect(() => {
+        setForm((prev) => ({ ...prev, time: "" }));
+    }, [form.date]);
+
     const handleChange = (e) => {
         setBackendError("");
         

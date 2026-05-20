@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import {useUserRestaurantStore} from "../store/useUserRestaurantStore";
 import {useSaveUserReservations} from "../hooks/useSaveUserReservations";
+import { checkReservationAvailability } from "../../../shared/api/admin";
 
 import {
     XMarkIcon
@@ -25,6 +26,9 @@ export const CreateUserRestaurantModal = ({isOpen, onClose, restaurant}) => {
     const {saveReservation} = useSaveUserReservations();
 
     const [error, setError] = useState("");
+    const [dateError, setDateError] = useState("");
+    const [backendError, setBackendError] = useState("");
+    const [dateError, setDateError] = useState("");
 
     useEffect(() => {
         if (
@@ -53,12 +57,72 @@ export const CreateUserRestaurantModal = ({isOpen, onClose, restaurant}) => {
         }
     }, [form.guests, form.table]);
 
+    useEffect(() => {
+        if (!form.reservationDate || !form.time) {
+            setDateError("");
+            return;
+        }
+
+        const now = new Date();
+        const selected = new Date(`${form.reservationDate}T${form.time}`);
+
+        if (selected < now) {
+            setDateError("No puedes crear reservaciones en fechas u horas pasadas");
+        } else {
+            setDateError("");
+        }
+    }, [form.reservationDate, form.time]);
+
+    // Si el usuario cambia la fecha, limpiar la hora para obligar a elegir una nueva
+    useEffect(() => {
+        // limpia la hora cuando la fecha cambia
+        setForm((prev) => ({ ...prev, time: "" }));
+    }, [form.reservationDate]);
+
+    useEffect(() => {
+        const checkAvailability = async () => {
+            if (!form.table || !form.reservationDate || !form.time) {
+                setBackendError("");
+                return;
+            }
+
+            try {
+                setBackendError("");
+                await checkReservationAvailability({
+                    tableId: form.table,
+                    date: form.reservationDate,
+                    time: form.time
+                });
+            } catch (err) {
+                setBackendError(err.response?.data?.message || 'Mesa ocupada en ese horario');
+            }
+        };
+
+        checkAvailability();
+    }, [form.table, form.reservationDate, form.time]);
+
+    useEffect(() => {
+        if (!form.reservationDate || !form.time) {
+            setDateError("");
+            return;
+        }
+
+        const now = new Date();
+        const selected = new Date(`${form.reservationDate}T${form.time}`);
+
+        if (selected < now) {
+            setDateError("No puedes crear reservaciones en fechas u horas pasadas");
+        } else {
+            setDateError("");
+        }
+    }, [form.reservationDate, form.time]);
+
     if (!isOpen) return null;
 
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        if (error) return;
+        if (error || dateError) return;
 
         const result = await saveReservation({
             restaurant: restaurant._id,
@@ -286,7 +350,7 @@ export const CreateUserRestaurantModal = ({isOpen, onClose, restaurant}) => {
                             type="submit"
                             disabled={
                                 loading ||
-                                !!error
+                                    !!error || !!dateError
                             }
                             className="rounded-2xl bg-yellow-500 px-6 py-3 font-bold text-white transition hover:bg-yellow-600 disabled:cursor-not-allowed disabled:opacity-60"
                         >
