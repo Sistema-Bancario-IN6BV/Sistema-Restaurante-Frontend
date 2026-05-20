@@ -3,7 +3,7 @@ import { useAuthStore } from "../../features/auth/store/authStore";
 
 const axiosAuth = axios.create({
     baseURL: import.meta.env.VITE_AUTH_URL,
-    timeout: 8000,
+    timeout: 15000,
     headers: {
         "Content-Type": "application/json"
     }
@@ -11,7 +11,7 @@ const axiosAuth = axios.create({
 
 const axiosAdmin = axios.create({
     baseURL: import.meta.env.VITE_ADMIN_URL,
-    timeout: 10000,
+    timeout: 15000,
     headers: {
         "Content-Type": "application/json"
     }
@@ -28,11 +28,24 @@ axiosAuth.interceptors.request.use((config) => {
 
 // Interceptor para axiosAdmin
 axiosAdmin.interceptors.request.use((config) => {
+    const isFormData = typeof FormData !== "undefined" && config.data instanceof FormData;
+
+    if (isFormData) {
+        // Let the browser set multipart boundary automatically.
+        if (config.headers) {
+            delete config.headers["Content-Type"];
+            delete config.headers["content-type"];
+        }
+    }
+
     const token = useAuthStore.getState().token;
     if (token) {
         config.headers = config.headers || {};
         config.headers.Authorization = `Bearer ${token}`;
     }
+    try {
+        console.log('[axiosAdmin] request ->', config.method, config.baseURL + config.url, { headers: config.headers });
+    } catch (e) {}
     return config;
 });
 

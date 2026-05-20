@@ -22,7 +22,6 @@ import { Events } from "../../features/events/pages/Events.jsx";
 import { DashboardPage } from "../Layouts/DashboardPage.jsx";
 import { ReportsPage } from "../../features/dashboard/pages/ReportsPage.jsx";
 import { HomePage } from "../../features/home/pages/HomePage.jsx";
-// orders component
 import { InvoicesPage } from "../../features/invoices/pages/InvoicesPage.jsx";
 import { InvoicesPage as UserInvoicesPage } from "../../features/invoices/userInvoices/pages/InvoicesPage.jsx";
 import { UserMenuItems } from "../../features/menuItems/components/userMenuItems/pages/UserMenuItems.jsx";
@@ -101,4 +100,3 @@ export const AppRoutes = () => {
         </Routes>
     );
 };
- 
