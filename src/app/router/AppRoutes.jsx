@@ -23,9 +23,14 @@ import { DashboardPage } from "../Layouts/DashboardPage.jsx";
 import { ReportsPage } from "../../features/dashboard/pages/ReportsPage.jsx";
 import { HomePage } from "../../features/home/pages/HomePage.jsx";
 import { InvoicesPage } from "../../features/invoices/pages/InvoicesPage.jsx";
+import { InvoicesPage as UserInvoicesPage } from "../../features/invoices/userInvoices/pages/InvoicesPage.jsx";
+import { UserMenuItems } from "../../features/menuItems/components/userMenuItems/pages/UserMenuItems.jsx";
+// vista customers
 import { UserReservation } from "../../features/reservation/userReservation/components/UserReservation.jsx";
 import { UserRestaurant } from "../../features/restaurants/userRestaurants/components/UserRestaurant.jsx";
-
+import { OrdersPage } from "../../features/orders/userOrders/components/UserOrdersPage.jsx";
+import { EventsPage } from "../../features/events/pages/EventsPage.jsx";
+import { EventDetail } from "../../features/events/pages/EventDetail.jsx";
 export const AppRoutes = () => {
     return (
         <Routes>
@@ -79,14 +84,16 @@ export const AppRoutes = () => {
                     </ProtectedRoute>
                 }
             >
-                <Route index element={<HomePage />} />
+                <Route index element={<UserRestaurant />} />
                 <Route path="home" element={<HomePage />} />
                 <Route path="restaurants" element={<UserRestaurant />} />
-                <Route path="menu" element={<MenuItems />} />
-                <Route path="menu/:restaurantId" element={<MenuItems />} />
+                <Route path="menu/:restaurantId" element={<UserMenuItems />} />
+                <Route path="events" element={<EventsPage />} />
+                <Route path="events/:id" element={<EventDetail />} />
                 <Route path="reservations" element={<UserReservation />} />
-                <Route path="orders" element={<Orders />} />
-                <Route path="invoices" element={<InvoicesPage />} />
+                <Route path="orders" element={<OrdersPage />} />
+                <Route path="invoices" element={<UserInvoicesPage />} />
+
             </Route>
 
             <Route path="*" element={<Navigate to="/" replace />} />

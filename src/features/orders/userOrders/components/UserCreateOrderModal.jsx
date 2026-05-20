@@ -1,13 +1,13 @@
 import { useEffect, useMemo, useState } from "react";
-import { axiosAdmin } from "../../../shared/api/api.js";
-import { getAllMenuItems } from "../../../shared/api/menuItems.js";
-import { getTables } from "../../../shared/api/tables.js";
-import { useOrderStore } from "../store/useOrderStore";
-import { useAuthStore } from "../../auth/store/authStore";
-import { showError, showSuccess } from "../../../shared/utils/toast.js";
+import { axiosAdmin } from "../../../../shared/api/index.js";
+import { getAllMenuItems } from "../../../../shared/api/menuItems.js";
+import { getTables } from "../../../../shared/api/index.js";
+import { useUserOrderStore } from "../store/useUserOrderStore.js";
+import { useAuthStore } from "../../../auth/store/authStore.js";
+import { showError, showSuccess } from "../../../../shared/utils/toast.js";
 
-export const CreateOrderModal = ({ isOpen, onClose }) => {
-  const { createOrder } = useOrderStore();
+export const UserCreateOrderModal = ({ isOpen, onClose }) => {
+  const { createOrder } = useUserOrderStore();
   const { user } = useAuthStore();
   const [loading, setLoading] = useState(false);
   const [restaurants, setRestaurants] = useState([]);

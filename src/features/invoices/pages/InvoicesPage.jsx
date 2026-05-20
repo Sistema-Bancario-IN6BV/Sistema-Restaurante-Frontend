@@ -158,7 +158,7 @@ export const InvoicesPage = () => {
 
       </div>
 
-      {/* RESUMEN */}
+      {}
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-8">
 
@@ -239,7 +239,7 @@ export const InvoicesPage = () => {
 
       </div>
 
-      {/* LISTA FACTURAS */}
+      {}
 
       <div
         className="
@@ -250,7 +250,7 @@ export const InvoicesPage = () => {
         "
       >
 
-        {invoices.map((invoice) => (
+        {invoices.filter(inv => inv.status !== 'CANCELLED').map((invoice) => (
 
           <div
             key={invoice._id}
@@ -265,7 +265,7 @@ export const InvoicesPage = () => {
             "
           >
 
-            {/* HEADER */}
+            {}
 
             <div className="flex justify-between items-start mb-5">
 
@@ -309,7 +309,7 @@ export const InvoicesPage = () => {
 
             </div>
 
-            {/* PRODUCTOS */}
+            {}
 
             <div className="space-y-3">
 
@@ -367,7 +367,7 @@ export const InvoicesPage = () => {
 
             </div>
 
-            {/* FOOTER */}
+            {}
 
             <div
               className="
@@ -396,34 +396,7 @@ export const InvoicesPage = () => {
 
               <div className="flex gap-3">
 
-                {
-                  invoice.status === "PENDING" && (
-
-                    <button
-                      onClick={() =>
-                        payInvoice(
-                          invoice._id,
-                          "CARD"
-                        )
-                      }
-                      className="
-                        bg-green-600
-                        hover:bg-green-700
-                        text-white
-                        px-5
-                        py-2
-                        rounded-xl
-                        font-semibold
-                        transition-all
-                      "
-                    >
-
-                      Pagar
-
-                    </button>
-
-                  )
-                }
+                {}
 
                 <button
                   onClick={() =>

@@ -6,6 +6,9 @@ export const createOrder = (data) =>
 export const getMyOrders = () =>
   axiosAdmin.get("/orders/my");
 
+export const getOrdersByRestaurant = (restaurantId, params = {}) =>
+  axiosAdmin.get(`/orders/restaurant/${restaurantId}`, { params });
+
 export const updateOrderStatus = (
   id,
   status

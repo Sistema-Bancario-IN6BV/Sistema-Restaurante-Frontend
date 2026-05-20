@@ -3,7 +3,8 @@ import { create } from "zustand";
 import {
   getMyInvoices as getMyInvoicesRequest,
   payInvoice as payInvoiceRequest,
-} from "../../../shared/api/invoices";
+  deleteInvoice as deleteInvoiceRequest,
+} from "../../../../shared/api/invoices";
 
 export const useInvoiceStore = create((set, get) => ({
   invoices: [],
@@ -27,18 +28,15 @@ export const useInvoiceStore = create((set, get) => ({
       });
     }
   },
-
-    deleteInvoice: async (id) => {
-      try {
-        const res = await (await import("../../../shared/api/invoices.js")).deleteInvoice(id);
-        
-        set({ invoices: get().invoices.filter((i) => i._id !== id) });
-        return res.data || res;
-      } catch (error) {
-        set({ error: error.response?.data?.message });
-        throw error;
-      }
-    },
+  
+  deleteInvoice: async (id) => {
+    try {
+      await deleteInvoiceRequest(id);
+      set({ invoices: get().invoices.filter(i => i._id !== id) });
+    } catch (error) {
+      set({ error: error.response?.data?.message });
+    }
+  },
 
   payInvoice: async (id, paymentMethod) => {
     try {

@@ -1,12 +1,12 @@
 import { useEffect, useState, useMemo } from "react";
-import { getTables } from "../../../shared/api/tables.js";
-import { getAllMenuItems } from "../../../shared/api/menuItems.js";
-import { useOrderStore } from "../store/useOrderStore";
-import { useAuthStore } from "../../auth/store/authStore";
-import { showError, showSuccess } from "../../../shared/utils/toast.js";
+import { getTables } from "../../../../shared/api/tables.js";
+import { getAllMenuItems } from "../../../../shared/api/menuItems.js";
+import { useUserOrderStore } from "../store/useUserOrderStore.js";
+import { useAuthStore } from "../../../auth/store/authStore.js";
+import { showError, showSuccess } from "../../../../shared/utils/toast.js";
 
-export const EditOrderModal = ({ isOpen, onClose, order }) => {
-  const { updateOrder } = useOrderStore();
+export const UserEditOrderModal = ({ isOpen, onClose, order }) => {
+  const { updateOrder } = useUserOrderStore();
   const { user } = useAuthStore();
 
   const [type, setType] = useState(order?.type || "DINE_IN");
