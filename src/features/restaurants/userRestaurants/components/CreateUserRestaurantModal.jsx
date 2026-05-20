@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import {useUserRestaurantStore} from "../store/useUserRestaurantStore";
 import {useSaveUserReservations} from "../hooks/useSaveUserReservations";
-import { checkReservationAvailability } from "../../../shared/api/admin";
+import { checkReservationAvailability } from "../../../../shared/api/admin";
 
 import {
     XMarkIcon
@@ -28,7 +28,6 @@ export const CreateUserRestaurantModal = ({isOpen, onClose, restaurant}) => {
     const [error, setError] = useState("");
     const [dateError, setDateError] = useState("");
     const [backendError, setBackendError] = useState("");
-    const [dateError, setDateError] = useState("");
 
     useEffect(() => {
         if (
