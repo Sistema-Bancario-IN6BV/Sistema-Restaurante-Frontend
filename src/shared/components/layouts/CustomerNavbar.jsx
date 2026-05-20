@@ -18,7 +18,6 @@ import { useState } from "react";
 
   const customerMenu = [
   { label: "Restaurantes", to: "/customer/restaurants", icon: BuildingStorefrontIcon },
-  { label: "Menú", to: "/customer/restaurants", icon: BookOpenIcon },
   { label: "Mis Reservas", to: "/customer/reservations", icon: CalendarDaysIcon },
   { label: "Mis Pedidos", to: "/customer/orders", icon: ShoppingBagIcon },
   { label: "Eventos", to: "/customer/events", icon: CalendarDaysIcon },

@@ -6,6 +6,8 @@ import {
     createReservationRequest
 } from "../../../../shared/api/customer";
 
+import { useUserReservationStore } from "../../../reservation/userReservation/store/useUserReservationStore";
+
 export const useUserRestaurantStore = create((set) => ({
 
     restaurants: [],
@@ -104,6 +106,18 @@ export const useUserRestaurantStore = create((set) => ({
             set({
                 loading: false
             });
+
+            // Añadir la nueva reservación al store de usuario para que aparezca inmediatamente
+            try {
+                const newRes = response?.data;
+                if (newRes) {
+                    useUserReservationStore.setState((state) => ({
+                        reservations: [newRes, ...(state.reservations || [])]
+                    }));
+                }
+            } catch (err) {
+                // ignore
+            }
 
             return {
                 success: true,
