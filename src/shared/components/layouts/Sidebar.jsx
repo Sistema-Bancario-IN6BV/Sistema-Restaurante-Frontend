@@ -13,19 +13,21 @@ import {
     InboxStackIcon,
     BeakerIcon,
     HomeIcon,
+    SparklesIcon,
 } from "@heroicons/react/24/outline";
 
 const menuItemsByRole = {
     PLATFORM_ADMIN: [
         { label: "Dashboard", to: "/dashboard", icon: ChartBarIcon },
         { label: "Restaurantes", to: "/dashboard/restaurants", icon: BuildingStorefrontIcon },
+        { label: "Platos", to: "/dashboard/menu-items", icon: SparklesIcon },
         { label: "Usuarios", to: "/dashboard/users", icon: UsersIcon },
         { label: "Reportes", to: "/dashboard/reports", icon: ChartPieIcon },
     ],
     RESTAURANT_ADMIN: [
         { label: "Dashboard", to: "/dashboard", icon: ChartBarIcon },
         { label: "Pedidos", to: "/dashboard/orders", icon: ShoppingBagIcon },
-        { label: "Menú", to: "/dashboard/menu", icon: BookOpenIcon },
+        { label: "Platos", to: "/dashboard/menu-items", icon: SparklesIcon },
         { label: "Mesas", to: "/dashboard/tables", icon: TableCellsIcon },
         { label: "Reservas", to: "/dashboard/reservations", icon: CalendarDaysIcon },
         { label: "Eventos", to: "/dashboard/events", icon: CalendarDaysIcon },
@@ -35,11 +37,11 @@ const menuItemsByRole = {
         { label: "Reportes", to: "/dashboard/reports", icon: ChartPieIcon },
     ],
     CUSTOMER: [
-        { label: "Inicio", to: "/home", icon: HomeIcon },
-        { label: "Restaurantes", to: "/restaurants", icon: BuildingStorefrontIcon },
-        { label: "Mis Reservas", to: "/dashboard/reservations", icon: CalendarDaysIcon },
-        { label: "Mis Pedidos", to: "/dashboard/orders", icon: ShoppingBagIcon },
-        { label: "Mis Facturas", to: "/dashboard/invoices", icon: ReceiptPercentIcon },
+        { label: "Inicio", to: "/customer/home", icon: HomeIcon },
+        { label: "Restaurantes", to: "/customer/restaurants", icon: BuildingStorefrontIcon },
+        { label: "Mis Reservas", to: "/customer/reservations", icon: CalendarDaysIcon },
+        { label: "Mis Pedidos", to: "/customer/orders", icon: ShoppingBagIcon },
+        { label: "Mis Facturas", to: "/customer/invoices", icon: ReceiptPercentIcon },
     ],
 };
 

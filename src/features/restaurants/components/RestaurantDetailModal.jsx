@@ -44,15 +44,15 @@ const categoryBadgeClass = {
 	OTRA: "bg-bg-page text-text-muted border border-accent/20",
 };
 
+import { resolveImageUrl } from "../../../shared/utils/imageUrl.js";
+
 const restaurantCoverUrl = (path) => {
     if (!path) return null;
-    if (path.startsWith("http://") || path.startsWith("https://")) {
-        return path;
-    }
-    const cloudinaryBase =
-        import.meta.env.VITE_CLOUDINARY_BASE_URL ||
-        "https://res.cloudinary.com/db5rnorf/image/upload/";
-    return `${cloudinaryBase}${path.replace(/^\/+/, "")}`;
+    const value = typeof path === "object"
+        ? path.secure_url || path.url || path.path || path.location || path.filename || null
+        : path;
+    if (!value) return null;
+    return resolveImageUrl(value);
 };
 
 export const RestaurantDetailModal = ({
@@ -62,6 +62,22 @@ export const RestaurantDetailModal = ({
     onSave,
     loading,
 }) => {
+    const parseTagsForInput = (tags) => {
+        if (!tags) return "";
+        if (Array.isArray(tags)) return tags.join(", ");
+        if (typeof tags === "string") {
+            const s = tags.trim();
+            if (s.startsWith("[")) {
+                try {
+                    const parsed = JSON.parse(s);
+                    if (Array.isArray(parsed)) return parsed.join(", ");
+                } catch (e) {}
+            }
+            return tags;
+        }
+        return "";
+    };
+
     const {
         register,
         handleSubmit,
@@ -81,7 +97,7 @@ export const RestaurantDetailModal = ({
             zipCode: restaurant?.address?.zipCode || "",
             avgPrice: restaurant?.avgPrice || "",
             schedule: restaurant?.schedule || "",
-            tags: Array.isArray(restaurant?.tags) ? restaurant.tags.join(", ") : "",
+            tags: parseTagsForInput(restaurant?.tags),
             active: restaurant?.active ?? true,
         }
     });
@@ -105,7 +121,7 @@ export const RestaurantDetailModal = ({
                 zipCode: restaurant?.address?.zipCode || "",
                 avgPrice: restaurant?.avgPrice || "",
                 schedule: restaurant?.schedule || "",
-                tags: Array.isArray(restaurant?.tags) ? restaurant.tags.join(", ") : "",
+                tags: parseTagsForInput(restaurant?.tags),
                 active: restaurant?.active ?? true,
             });
         }
@@ -129,8 +145,22 @@ export const RestaurantDetailModal = ({
         formData.append("address[state]", values.state || "");
         formData.append("address[zipCode]", values.zipCode || "");
 
-        // Tags as JSON array string
-        const tagsArray = values.tags ? values.tags.split(",").map(t => t.trim()).filter(Boolean) : [];
+        // Normalize tags: accept JSON string or comma-separated input and send JSON stringified array once
+        let tagsArray = [];
+        if (values.tags) {
+            const s = values.tags.trim();
+            if (s.startsWith("[")) {
+                try {
+                    const parsed = JSON.parse(s);
+                    if (Array.isArray(parsed)) tagsArray = parsed.map(t => String(t).trim()).filter(Boolean);
+                } catch (e) {
+                    // fallback to comma split
+                    tagsArray = s.split(",").map(t => t.trim()).filter(Boolean);
+                }
+            } else {
+                tagsArray = s.split(",").map(t => t.trim()).filter(Boolean);
+            }
+        }
         formData.append("tags", JSON.stringify(tagsArray));
 
         // Photo if selected
