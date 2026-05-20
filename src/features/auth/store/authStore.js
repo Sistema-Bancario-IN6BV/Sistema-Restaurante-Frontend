@@ -22,27 +22,10 @@ export const useAuthStore = create(
 
             checkAuth: () => {
                 const token = get().token;
-                const role = get().user?.role;
-                const isAdmin = role === "RESTAURANT_ADMIN" || role === "PLATFORM_ADMIN";
-
-                if (token && !isAdmin) {
-                    set({
-                        user: null,
-                        userId: null,
-                        token: null,
-                        refreshToken: null,
-                        expiresAt: null,
-                        isAuthenticated: false,
-                        isLoadingAuth: false,
-                        loading: false,
-                        error: ""
-                    })
-                    return;
-                }
-
+                // If token exists, keep user authenticated regardless of role.
                 set({
                     isLoadingAuth: false,
-                    isAuthenticated: Boolean(token) && isAdmin
+                    isAuthenticated: Boolean(token)
                 })
             },
 
@@ -77,7 +60,13 @@ export const useAuthStore = create(
                 try {
                     set({ loading: true, error: null });
 
-                    const { data } = await loginRequest({ emailOrUsername, password })
+                    const normalizedEmailOrUsername = String(emailOrUsername || "").trim();
+                    const normalizedPassword = String(password || "");
+
+                    const { data } = await loginRequest({
+                        emailOrUsername: normalizedEmailOrUsername,
+                        password: normalizedPassword
+                    })
                     console.log(data)
 
                     set({

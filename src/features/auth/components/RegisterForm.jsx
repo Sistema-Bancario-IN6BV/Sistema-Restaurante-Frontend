@@ -109,7 +109,7 @@ export const RegisterForm = ({ onSwitch }) => {
                     </label>
                     <input
                         type="email"
-                        placeholder="usuario@noiregrill.com"
+                        placeholder="usuario@kinaleats.com"
                         className="w-full px-4 py-2.5 text-sm bg-bg-page border border-text-mid/30 rounded-lg focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent text-text-dark placeholder:text-text-muted transition-all duration-300 shadow-sm"
                         {...register("email", { 
                             required: "El correo es obligatorio",

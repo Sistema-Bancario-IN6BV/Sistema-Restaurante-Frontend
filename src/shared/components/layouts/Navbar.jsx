@@ -7,10 +7,10 @@ export const Navbar = () => {
       <div className="w-full px-6 md:px-8 h-20 flex items-center justify-between">
         <div className="flex items-center gap-4">
           <img src={imgLogo}
-          alt="Noir & Grill Logo" 
+          alt="kinalEats logo" 
           className="h-12 w-12 md:h-14 md:w-14 rounded-full object-cover border border-accent/30 drop-shadow-[0_0_10px_rgba(245,200,66,0.3)] shadow-[0_2px_10px_rgba(0,0,0,0.5)]" />
-          <Typography variant="h5" className="font-bold text-accent font-serif tracking-widest hidden sm:block">
-            Noir & Grill
+          <Typography variant="h5" className="font-black text-accent font-serif tracking-widest hidden sm:block">
+            kinalEats
           </Typography>
         </div>
         <AvatarUser />
