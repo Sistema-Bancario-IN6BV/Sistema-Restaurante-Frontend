@@ -62,7 +62,7 @@ export const Orders = () => {
 
     loadOrders();
 
-    // Start realtime polling
+    
     if (typeof window !== 'undefined') {
       try {
         useOrderStore.getState().startRealtime();

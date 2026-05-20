@@ -29,14 +29,14 @@ export const Events = () => {
     const [actionLoading, setActionLoading] = useState(false);
     const [selectedRestaurantId, setSelectedRestaurantId] = useState("");
 
-// cargar restaurantes del admin al iniciar
+
     useEffect(() => {
         if (userId) {
             fetchRestaurantsByAdmin(userId);
         }
     }, [userId, fetchRestaurantsByAdmin]);
     
-    // establecer el primer restaurante por defecto cuando carguen
+    
     useEffect(() => {
         if (restaurants.length > 0 && !selectedRestaurantId) {
 setSelectedRestaurantId(restaurants[0]?._id || "");
@@ -86,10 +86,10 @@ const handleSave = async (formData) => {
         let result;
         
         if (selectedEvent) {
-            // Editar evento existente
+            
             result = await updateEvent(selectedEvent.id, formData);
         } else {
-            // Crear nuevo evento - incluir restaurantId
+            
 const restaurantId = selectedRestaurantId || restaurants[0]?._id;
             console.log("Creating event with restaurantId:", restaurantId, "restaurants:", restaurants);
             
@@ -157,7 +157,7 @@ const restaurantId = selectedRestaurantId || restaurants[0]?._id;
 
     return (
         <div className="p-4">
-            {/* Header */}
+            {}
             <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-6">
                 <div>
                     <h1 className="text-3xl font-bold text-[#C8860A] font-serif">
@@ -176,7 +176,7 @@ const restaurantId = selectedRestaurantId || restaurants[0]?._id;
                 </button>
             </div>
 
-            {/* Filtros */}
+            {}
             <div className="bg-[#F2EAE0] rounded-xl border border-[#E8DFD0] shadow-lg p-4 mb-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <input
@@ -205,7 +205,7 @@ const restaurantId = selectedRestaurantId || restaurants[0]?._id;
                 </div>
             </div>
 
-            {/* Tabla */}
+            {}
             {loading && !actionLoading ? (
                 <div className="flex justify-center py-12">
                     <Spinner />
@@ -214,7 +214,7 @@ const restaurantId = selectedRestaurantId || restaurants[0]?._id;
                 <div className="bg-[#F2EAE0] rounded-xl border border-[#E8DFD0] shadow-lg overflow-hidden">
                     <div className="overflow-x-auto">
                         <table className="min-w-full text-sm">
-                            {/* Head */}
+                            {}
                             <thead className="bg-[#FAF6F0]/50 text-[#3A2418] border-b border-[#E8DFD0]">
                                 <tr>
                                     <th className="text-left px-6 py-4 font-semibold uppercase tracking-wider text-xs">
@@ -235,7 +235,7 @@ const restaurantId = selectedRestaurantId || restaurants[0]?._id;
                                 </tr>
                             </thead>
 
-                            {/* Body */}
+                            {}
                             <tbody className="divide-y divide-[#E8DFD0]">
                                 {paginatedEvents.length === 0 ? (
                                     <tr>
@@ -368,7 +368,7 @@ const restaurantId = selectedRestaurantId || restaurants[0]?._id;
                         </table>
                     </div>
 
-                    {/* Paginación */}
+                    {}
                     <div className="flex items-center justify-between px-6 py-4 border-t border-[#E8DFD0] bg-[#FAF6F0]/20">
                         <p className="text-xs text-[#6B5040]">
                             {" "}Mostrando {" "}

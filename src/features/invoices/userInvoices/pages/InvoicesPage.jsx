@@ -1,22 +1,57 @@
-import { useEffect } from "react";
+import {
+  useEffect,
+  useState,
+  useMemo,
+} from "react";
+
 import { useInvoiceStore } from "../store/useInvoiceStore";
+import { useAuthStore } from "../../../auth/store/authStore";
 
 export const InvoicesPage = () => {
-
   const {
-    invoices,
+    invoices = [],
     getInvoices,
-    payInvoice,
+    deleteInvoice,
   } = useInvoiceStore();
+
+  const [search, setSearch] =
+    useState("");
+
+  const user = useAuthStore((s) => s.user);
 
   useEffect(() => {
     getInvoices();
   }, []);
 
-  const handlePrint = (invoice) => {
+  const visibleInvoices =
+    useMemo(() => {
+      const value =
+        search.toLowerCase();
 
+      return invoices.filter(
+        (invoice) =>
+          (
+            invoice.items || []
+          ).some((item) =>
+            (
+              item.name || ""
+            )
+              .toLowerCase()
+              .includes(value)
+          )
+      );
+    }, [invoices, search]);
+
+  const handlePrint = (
+    invoice
+  ) => {
     const printWindow =
-      window.open("", "_blank");
+      window.open(
+        "",
+        "_blank"
+      );
+
+    if (!printWindow) return;
 
     printWindow.document.write(`
       <html>
@@ -24,7 +59,7 @@ export const InvoicesPage = () => {
         <head>
 
           <title>
-            Factura ${invoice.invoiceNumber}
+            Factura
           </title>
 
           <style>
@@ -38,16 +73,6 @@ export const InvoicesPage = () => {
             h1{
               color:#b48a57;
               margin-bottom:5px;
-            }
-
-            .subtitle{
-              color:#777;
-              margin-bottom:20px;
-            }
-
-            .status{
-              margin-bottom:20px;
-              font-weight:bold;
             }
 
             table{
@@ -80,22 +105,14 @@ export const InvoicesPage = () => {
         <body>
 
           <h1>
-            ${invoice.invoiceNumber}
+            Factura
           </h1>
-
-          <p class="subtitle">
-            Factura Restaurante
-          </p>
-
-          <p class="status">
-            Estado:
-            ${invoice.status}
-          </p>
 
           <p>
             Fecha:
-            ${new Date(invoice.createdAt)
-              .toLocaleDateString()}
+            ${new Date(
+              invoice.createdAt
+            ).toLocaleDateString()}
           </p>
 
           <table>
@@ -113,23 +130,66 @@ export const InvoicesPage = () => {
 
             <tbody>
 
-              ${invoice.items.map(item => `
+              ${(
+                invoice.items || []
+              )
+                .map((item) => {
+                  const unit =
+                    Number(
+                      item.unitPrice ??
+                        item.price ??
+                        item.unit_price ??
+                        0
+                    );
 
-                <tr>
-                  <td>${item.name}</td>
-                  <td>${item.quantity}</td>
-                  <td>Q${item.unitPrice}</td>
-                  <td>Q${item.subtotal}</td>
-                </tr>
+                  const subtotal =
+                    (
+                      Number(
+                        item.quantity
+                      ) || 1
+                    ) * unit;
 
-              `).join("")}
+                  return `
+                    <tr>
+                      <td>${item.name}</td>
+                      <td>${item.quantity}</td>
+                      <td>Q${unit.toFixed(
+                        2
+                      )}</td>
+                      <td>Q${subtotal.toFixed(
+                        2
+                      )}</td>
+                    </tr>
+                  `;
+                })
+                .join("")}
 
             </tbody>
 
           </table>
 
           <div class="total">
-            TOTAL: Q${invoice.total}
+            TOTAL:
+            Q${(
+              invoice.items || []
+            )
+              .reduce(
+                (s, it) =>
+                  s +
+                  Number(
+                    it.unitPrice ??
+                      it.price ??
+                      it.unit_price ??
+                      0
+                  ) *
+                    (
+                      Number(
+                        it.quantity
+                      ) || 1
+                    ),
+                0
+              )
+              .toFixed(2)}
           </div>
 
         </body>
@@ -143,25 +203,19 @@ export const InvoicesPage = () => {
   };
 
   return (
-
     <main className="p-6">
-
       <div className="mb-8">
-
         <h1 className="text-4xl font-bold text-accent">
           Facturas
         </h1>
 
         <p className="text-text-muted mt-2">
-          Gestión e impresión de facturas
+          Gestión e impresión
+          de facturas
         </p>
-
       </div>
 
-      {/* RESUMEN */}
-
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-8">
-
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-8">
         <div
           className="
             bg-bg-card
@@ -171,7 +225,6 @@ export const InvoicesPage = () => {
             shadow-md
           "
         >
-
           <p className="text-sm text-text-muted">
             Facturas Totales
           </p>
@@ -179,7 +232,6 @@ export const InvoicesPage = () => {
           <h2 className="text-4xl font-bold text-accent mt-2">
             {invoices.length}
           </h2>
-
         </div>
 
         <div
@@ -191,55 +243,42 @@ export const InvoicesPage = () => {
             shadow-md
           "
         >
-
           <p className="text-sm text-text-muted">
             Total Generado
           </p>
 
           <h2 className="text-4xl font-bold text-green-400 mt-2">
-            Q{
-              invoices
-                .reduce(
-                  (acc, invoice) =>
-                    acc + invoice.total,
-                  0
-                )
-                .toFixed(2)
-            }
+            Q
+            {invoices
+              .reduce(
+                (
+                  acc,
+                  invoice
+                ) =>
+                  acc +
+                  Number(
+                    invoice.total ||
+                      0
+                  ),
+                0
+              )
+              .toFixed(2)}
           </h2>
-
         </div>
-
-        <div
-          className="
-            bg-bg-card
-            border border-accent/10
-            rounded-2xl
-            p-5
-            shadow-md
-          "
-        >
-
-          <p className="text-sm text-text-muted">
-            Facturas Pagadas
-          </p>
-
-          <h2 className="text-4xl font-bold text-blue-400 mt-2">
-
-            {
-              invoices.filter(
-                (invoice) =>
-                  invoice.status === "PAID"
-              ).length
-            }
-
-          </h2>
-
-        </div>
-
       </div>
 
-      {/* LISTA FACTURAS */}
+      <div className="mb-6">
+        <input
+          value={search}
+          onChange={(e) =>
+            setSearch(
+              e.target.value
+            )
+          }
+          placeholder="Buscar por plato..."
+          className="w-full md:w-1/2 px-4 py-3 border rounded-lg bg-bg-page focus:outline-none focus:border-accent"
+        />
+      </div>
 
       <div
         className="
@@ -249,186 +288,162 @@ export const InvoicesPage = () => {
           gap-5
         "
       >
-
-        {invoices.map((invoice) => (
-
-          <div
-            key={invoice._id}
-            className="
-              bg-bg-card
-              border border-accent/10
-              rounded-2xl
-              p-5
-              shadow-md
-              hover:shadow-xl
-              transition-all
-            "
-          >
-
-            {/* HEADER */}
-
-            <div className="flex justify-between items-start mb-5">
-
-              <div>
-
-                <h2 className="text-2xl font-bold text-accent">
-
-                  {invoice.invoiceNumber}
-
-                </h2>
-
-                <p className="text-sm text-text-muted mt-1">
-
-                  {
-                    new Date(invoice.createdAt)
-                      .toLocaleDateString()
-                  }
-
-                </p>
-
-              </div>
-
-              <span
-                className={`
-                  px-4
-                  py-2
-                  rounded-full
-                  text-xs
-                  font-bold
-                  ${
-                    invoice.status === "PAID"
-                      ? "bg-green-500/20 text-green-400 border border-green-500/30"
-                      : "bg-yellow-500/20 text-yellow-400 border border-yellow-500/30"
-                  }
-                `}
-              >
-
-                {invoice.status}
-
-              </span>
-
-            </div>
-
-            {/* PRODUCTOS */}
-
-            <div className="space-y-3">
-
-              {invoice.items.map((item, index) => (
-
-                <div
-                  key={index}
-                  className="
-                    flex
-                    justify-between
-                    items-center
-                    border-b
-                    border-accent/10
-                    pb-2
-                  "
-                >
-
-                  <div>
-
-                    <p className="font-semibold text-text-body">
-
-                      {item.name}
-
-                    </p>
-
-                    <p className="text-xs text-text-muted">
-
-                      Cantidad:
-                      {" "}
-                      {item.quantity}
-
-                    </p>
-
-                  </div>
-
-                  <div className="text-right">
-
-                    <p className="font-bold text-accent">
-
-                      Q{item.subtotal}
-
-                    </p>
-
-                    <p className="text-xs text-text-muted">
-
-                      Q{item.unitPrice} c/u
-
-                    </p>
-
-                  </div>
-
-                </div>
-
-              ))}
-
-            </div>
-
-            {/* FOOTER */}
-
+        {visibleInvoices.map(
+          (invoice) => (
             <div
+              key={invoice._id}
               className="
-                mt-6
-                pt-5
-                border-t border-accent/10
-                flex
-                justify-between
-                items-center
+                bg-bg-card
+                border border-accent/10
+                rounded-2xl
+                p-5
+                shadow-md
+                hover:shadow-xl
+                transition-all
               "
             >
+              <div className="flex justify-between items-start mb-5">
+                <div>
+                  <h2 className="text-2xl font-bold text-accent">
+                    Factura
+                  </h2>
 
-              <div>
-
-                <p className="text-sm text-text-muted">
-                  Total
-                </p>
-
-                <h3 className="text-3xl font-bold text-accent">
-
-                  Q{invoice.total}
-
-                </h3>
-
+                  <p className="text-sm text-text-muted mt-1">
+                    {new Date(
+                      invoice.createdAt
+                    ).toLocaleDateString()}
+                  </p>
+                </div>
               </div>
 
-              <div className="flex gap-3">
+              <div className="space-y-3">
+                {(
+                  invoice.items ||
+                  []
+                ).map(
+                  (
+                    item,
+                    index
+                  ) => {
+                    const unit =
+                      Number(
+                        item.unitPrice ??
+                          item.price ??
+                          item.unit_price ??
+                          0
+                      );
 
-                {
-                  invoice.status === "PENDING" && (
+                    const subtotal =
+                      unit *
+                      (
+                        Number(
+                          item.quantity
+                        ) || 1
+                      );
 
-                    <button
-                      onClick={() =>
-                        payInvoice(
-                          invoice._id,
-                          "CARD"
-                        )
+                    return (
+                      <div
+                        key={
+                          index
+                        }
+                        className="
+                          flex
+                          justify-between
+                          items-center
+                          border-b
+                          border-accent/10
+                          pb-2
+                        "
+                      >
+                        <div>
+                          <p className="font-semibold text-text-body">
+                            {
+                              item.name
+                            }
+                          </p>
+
+                          <p className="text-xs text-text-muted">
+                            Cantidad:{" "}
+                            {
+                              item.quantity
+                            }
+                          </p>
+                        </div>
+
+                        <div className="text-right">
+                          <p className="font-bold text-accent">
+                            Q
+                            {subtotal.toFixed(
+                              2
+                            )}
+                          </p>
+
+                          <p className="text-xs text-text-muted">
+                            Q
+                            {unit.toFixed(
+                              2
+                            )}{" "}
+                            c/u
+                          </p>
+                        </div>
+                      </div>
+                    );
+                  }
+                )}
+              </div>
+
+              <div
+                className="
+                  mt-6
+                  pt-5
+                  border-t border-accent/10
+                  flex
+                  justify-between
+                  items-center
+                "
+              >
+                <div>
+                  <p className="text-sm text-text-muted">
+                    Total
+                  </p>
+
+                  <h3 className="text-3xl font-bold text-accent">
+                    Q
+                    {Number(
+                      invoice.total ||
+                        0
+                    ).toFixed(2)}
+                  </h3>
+                </div>
+
+                {user?.role === 'CUSTOMER' && (
+                  <button
+                    onClick={async () => {
+                      const ok = window.confirm('¿Eliminar esta factura? Esta acción no se puede deshacer.');
+                      if (!ok) return;
+                      try {
+                        await deleteInvoice(invoice._id);
+                      } catch (err) {
+                        alert('Error al eliminar la factura');
                       }
-                      className="
-                        bg-green-600
-                        hover:bg-green-700
-                        text-white
-                        px-5
-                        py-2
-                        rounded-xl
-                        font-semibold
-                        transition-all
-                      "
-                    >
-
-                      Pagar
-
-                    </button>
-
-                  )
-                }
+                    }}
+                    className="
+                      bg-red-600
+                      hover:bg-red-700
+                      text-white
+                      px-5
+                      py-2
+                      rounded-xl
+                      font-semibold
+                      transition-all
+                    "
+                  >
+                    Eliminar
+                  </button>
+                )}
 
                 <button
-                  onClick={() =>
-                    handlePrint(invoice)
-                  }
+                  onClick={() => handlePrint(invoice)}
                   className="
                     bg-accent
                     text-bg-dark
@@ -440,21 +455,13 @@ export const InvoicesPage = () => {
                     transition-transform
                   "
                 >
-
                   Imprimir
-
                 </button>
-
               </div>
-
             </div>
-
-          </div>
-
-        ))}
-
+          )
+        )}
       </div>
-
     </main>
   );
 };

@@ -21,7 +21,7 @@ export const LoginForm = ({ onForgot, onRegister }) => {
         if(res.success){
             // Redirigir según rol
             const role = useAuthStore.getState().user?.role || user?.role
-            if(role === "CUSTOMER") navigate("/customer/home")
+            if(role === "CUSTOMER") navigate("/customer/restaurants")
             else navigate("/dashboard")
             toast.success("¡Bienvenido a kinalEats!", {
                 duration: 2000,

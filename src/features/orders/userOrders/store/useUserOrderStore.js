@@ -1,4 +1,4 @@
-/*import { create } from "zustand";
+import { create } from "zustand";
 
 import {
   createOrder as createOrderRequest,
@@ -10,7 +10,7 @@ import {
 } from "../../../../shared/api/orders";
 import { createInvoice as createInvoiceRequest } from "../../../../shared/api/invoices";
 
-export const useOrderStore = create((set, get) => ({
+export const useUserOrderStore = create((set, get) => ({
   orders: [],
   loading: false,
   error: null,
@@ -22,8 +22,13 @@ export const useOrderStore = create((set, get) => ({
 
       const response = await getMyOrdersRequest();
 
+      
+      const hiddenRaw = window.localStorage.getItem("hiddenOrders");
+      const hidden = hiddenRaw ? JSON.parse(hiddenRaw) : [];
+      const filtered = (response.data.data || []).filter((o) => !hidden.includes(o._id));
+
       set({
-        orders: response.data.data,
+        orders: filtered,
         loading: false,
       });
     } catch (error) {
@@ -69,12 +74,12 @@ export const useOrderStore = create((set, get) => ({
         loading: false,
       });
 
-      // If delivered, trigger invoice creation (backend will prevent duplicates)
+      
       if (updated?.status === "DELIVERED") {
         try {
           await createInvoiceRequest(updated._id);
         } catch (e) {
-          // non-fatal: log and continue
+          
           console.error("Error creating invoice:", e?.response?.data || e.message);
         }
       }
@@ -86,15 +91,20 @@ export const useOrderStore = create((set, get) => ({
     }
   },
 
-  // Realtime polling (fallback if sockets not available)
+  
   startRealtime: (intervalMs = 5000) => {
     if (get()._pollerId) return;
     const id = setInterval(async () => {
       try {
+        
+        if (typeof document !== 'undefined' && document.hidden) return;
         const res = await getMyOrdersRequest();
-        set({ orders: res.data.data });
+        const hiddenRaw = window.localStorage.getItem("hiddenOrders");
+        const hidden = hiddenRaw ? JSON.parse(hiddenRaw) : [];
+        const filtered = (res.data.data || []).filter((o) => !hidden.includes(o._id));
+        set({ orders: filtered });
       } catch (e) {
-        // ignore polling errors
+        
       }
     }, intervalMs);
     set({ _pollerId: id });
@@ -142,11 +152,35 @@ export const useOrderStore = create((set, get) => ({
         orders: get().orders.filter((o) => o._id !== id),
         loading: false,
       });
+      return { success: true, remote: true };
     } catch (error) {
+      
+      const status = error?.response?.status;
+      if (status === 403) {
+        
+        try {
+          const raw = window.localStorage.getItem("hiddenOrders");
+          const arr = raw ? JSON.parse(raw) : [];
+          if (!arr.includes(id)) {
+            arr.push(id);
+            window.localStorage.setItem("hiddenOrders", JSON.stringify(arr));
+          }
+        } catch (e) {
+          
+        }
+
+        set({
+          orders: get().orders.filter((o) => o._id !== id),
+          loading: false,
+        });
+        return { success: false, remote: false, local: true };
+      }
+
       set({
         loading: false,
         error: error.response?.data?.message || "Error al eliminar pedido",
       });
+      return { success: false };
     }
   },
 
@@ -171,4 +205,4 @@ export const useOrderStore = create((set, get) => ({
       throw error;
     }
   },
-}));*/
+}));

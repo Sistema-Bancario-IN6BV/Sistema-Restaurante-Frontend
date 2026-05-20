@@ -1,14 +1,27 @@
-/*import {
+import {
   useEffect,
   useMemo,
   useState,
+  useRef,
 } from "react";
 
-
 import { Spinner } from "../../../../shared/components/layouts/Spinner.jsx";
+
 import { useUserOrderStore } from "../../userOrders/store/useUserOrderStore.js";
-import { UserCreateOrderModal } from "./UserCreateOrderModal.jsx";
-import { UserEditOrderModal } from "../../userOrders/components/UserEditOrderModal.jsx";
+
+import {
+  createInvoice as createInvoiceRequest,
+  getMyInvoices as getMyInvoicesRequest,
+  getInvoiceByOrder,
+} from "../../../../shared/api/invoices";
+import { createReview as createReviewRequest } from '../../../../shared/api/reviews';
+
+import { getMenuItemById } from "../../../../shared/api/menuItems";
+
+import {
+  showSuccess,
+  showError,
+} from "../../../../shared/utils/toast";
 
 const PAGE_SIZE = 6;
 
@@ -30,12 +43,11 @@ const statusStyle = {
 };
 
 export const OrdersPage = () => {
-
   const {
     orders = [],
     getOrders,
     loading,
-  } = useOrderStore();
+  } = useUserOrderStore();
 
   const [search, setSearch] =
     useState("");
@@ -43,73 +55,83 @@ export const OrdersPage = () => {
   const [page, setPage] =
     useState(1);
 
-  const [openModal, setOpenModal] =
-    useState(false);
-
-  const [openEditModal, setOpenEditModal] = useState(false);
-  const [editOrder, setEditOrder] = useState(null);
+  const [
+    invoiceOrderIds,
+    setInvoiceOrderIds,
+  ] = useState(new Set());
 
   useEffect(() => {
-
-    const loadOrders = async () => {
+    const loadData = async () => {
       try {
         await getOrders();
+
+        const inv =
+          await getMyInvoicesRequest();
+
+        const list =
+          inv?.data?.data ||
+          inv?.data ||
+          inv ||
+          [];
+
+        const ids = new Set(
+          (list || []).map((i) =>
+            String(
+              i?.orderId?._id ||
+                i?.order?._id ||
+                i?.orderId ||
+                i?.order ||
+                ""
+            )
+          )
+        );
+
+        setInvoiceOrderIds(ids);
       } catch (error) {
         console.log(error);
       }
     };
 
-    loadOrders();
-
-    // Start realtime polling
-    if (typeof window !== 'undefined') {
-      try {
-        useOrderStore.getState().startRealtime();
-      } catch (e) {}
-    }
-
-    return () => {
-      try {
-        useOrderStore.getState().stopRealtime();
-      } catch (e) {}
-    };
-
+    loadData();
   }, []);
 
-  const filteredOrders = useMemo(() => {
+  const filteredOrders =
+    useMemo(() => {
+      const value =
+        search.toLowerCase();
 
-    const value =
-      search.toLowerCase();
-
-    return (orders || [])
-      .filter(
-        (order) =>
-          order.status !== "CANCELLED" &&
-          order.status !== "DELIVERED"
-      )
-      .filter(
-        (order) =>
-          order?.status
-            ?.toLowerCase()
+      return (
+        orders || []
+      ).filter((order) => {
+        return (
+          (order?.status || "")
+            .toLowerCase()
             .includes(value) ||
-          order?.type
-            ?.toLowerCase()
-            .includes(value)
-      );
 
-  }, [orders, search]);
+          (order?.type || "")
+            .toLowerCase()
+            .includes(value) ||
+
+          (
+            order?.restaurantId
+              ?.name || ""
+          )
+            .toLowerCase()
+            .includes(value)
+        );
+      });
+    }, [orders, search]);
 
   const totalPages = Math.max(
     1,
     Math.ceil(
       filteredOrders.length /
-      PAGE_SIZE
+        PAGE_SIZE
     )
   );
 
   const paginatedOrders =
     useMemo(() => {
-
       const start =
         (page - 1) *
         PAGE_SIZE;
@@ -118,296 +140,427 @@ export const OrdersPage = () => {
         start,
         start + PAGE_SIZE
       );
-
     }, [filteredOrders, page]);
 
   return (
     <div className="p-4">
-
       <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-6">
-
         <div>
-
           <h1 className="text-3xl font-bold text-accent font-serif">
             Pedidos
           </h1>
 
           <p className="text-sm text-accent/70 mt-1">
-            Gestión de pedidos y estados
+            Gestión de pedidos y
+            estados
           </p>
-
         </div>
-
-        <button
-          onClick={() =>
-            setOpenModal(true)
-          }
-          className="bg-accent px-6 py-2 rounded-xl text-bg-dark font-bold hover:bg-gold-light transition"
-        >
-          + Nuevo Pedido
-        </button>
-
       </div>
 
       <div className="bg-bg-card rounded-xl border border-accent/10 p-4 mb-5">
-
         <input
           value={search}
           onChange={(e) => {
             setSearch(
               e.target.value
             );
+
             setPage(1);
           }}
-          placeholder="Buscar por estado o tipo..."
+          placeholder="Buscar por estado o restaurante..."
           className="w-full px-4 py-3 rounded-xl border border-accent/20 bg-bg-page text-text-body"
         />
-
       </div>
 
-      <div className="bg-bg-card rounded-xl border border-accent/10 overflow-hidden shadow-lg">
-
-        <div className="overflow-x-auto">
-
-          <table className="w-full text-sm">
-
-            <thead className="bg-bg-page/50 border-b border-accent/10">
-
-              <tr>
-
-                <th className="text-left px-6 py-4 uppercase text-xs">
-                  Pedido
-                </th>
-
-                <th className="text-left px-6 py-4 uppercase text-xs">
-                  Platos
-                </th>
-
-                <th className="text-left px-6 py-4 uppercase text-xs">
-                  Tipo
-                </th>
-
-                <th className="text-left px-6 py-4 uppercase text-xs">
-                  Estado
-                </th>
-
-                <th className="text-right px-6 py-4 uppercase text-xs">
-                  Acciones
-                </th>
-
-              </tr>
-
-            </thead>
-
-            <tbody>
-
-              {loading ? (
-
-                <tr>
-
-                  <td
-                    colSpan={4}
-                    className="py-10"
-                  >
-                    <div className="flex justify-center">
-                      <Spinner />
-                    </div>
-                  </td>
-
-                </tr>
-
-              ) : paginatedOrders.length === 0 ? (
-
-                <tr>
-
-                  <td
-                    colSpan={4}
-                    className="text-center py-10 text-text-muted"
-                  >
-                    No hay pedidos
-                  </td>
-
-                </tr>
-
-              ) : (
-
-                paginatedOrders.map((order, index) => (
-                  <OrderRow
-                    key={order?._id || index}
-                    order={order}
-                    onEdit={(o) => {
-                      setEditOrder(o);
-                      setOpenEditModal(true);
-                    }}
-                  />
-                ))
-
-              )}
-
-            </tbody>
-
-          </table>
-
-        </div>
-
-        <div className="flex items-center justify-between px-6 py-4 border-t border-accent/10 bg-bg-page/20">
-
-          <p className="text-xs text-text-muted">
-
-            Mostrando{" "}
-
-            {paginatedOrders.length}
-
-            {" "}pedidos
-
-          </p>
-
-          <div className="flex gap-2">
-
-            <button
-              onClick={() =>
-                setPage((prev) =>
-                  Math.max(
-                    1,
-                    prev - 1
-                  )
-                )
-              }
-              disabled={page === 1}
-              className="px-4 py-2 rounded-lg border border-accent/20 bg-bg-page disabled:opacity-50"
-            >
-              Anterior
-            </button>
-
-            <span className="px-4 py-2 text-sm font-semibold">
-              {page} / {totalPages}
-            </span>
-
-            <button
-              onClick={() =>
-                setPage((prev) =>
-                  Math.min(
-                    totalPages,
-                    prev + 1
-                  )
-                )
-              }
-              disabled={
-                page === totalPages
-              }
-              className="px-4 py-2 rounded-lg border border-accent/20 bg-bg-page disabled:opacity-50"
-            >
-              Siguiente
-            </button>
-
+      <div className="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+        {loading ? (
+          <div className="col-span-full py-10 flex justify-center">
+            <Spinner />
           </div>
-
-        </div>
-
+        ) : paginatedOrders.length ===
+          0 ? (
+          <div className="col-span-full text-center py-10 text-text-muted">
+            No hay pedidos
+          </div>
+        ) : (
+          paginatedOrders.map(
+            (order) => (
+              <OrderCard
+                key={order._id}
+                order={order}
+                invoiceOrderIds={
+                  invoiceOrderIds
+                }
+                setInvoiceOrderIds={
+                  setInvoiceOrderIds
+                }
+              />
+            )
+          )
+        )}
       </div>
-
-      <CreateOrderModal
-        isOpen={openModal}
-        onClose={() =>
-          setOpenModal(false)
-        }
-      />
-
-      <EditOrderModal
-        isOpen={openEditModal}
-        onClose={() => setOpenEditModal(false)}
-        order={editOrder}
-      />
-
     </div>
   );
 };
 
-const OrderRow = ({ order, onEdit }) => {
-  const { updateStatus, cancelOrder } = useOrderStore();
+const OrderCard = ({
+  order,
+  invoiceOrderIds,
+  setInvoiceOrderIds,
+}) => {
+  const {
+    deleteOrder,
+    getOrders,
+  } = useUserOrderStore();
 
-  if (!order) return null;
+  const [imageUrl, setImageUrl] =
+    useState(null);
 
-  const handleCancel = async () => {
-    const ok = window.confirm("¿Confirmar cancelar el pedido?");
-    if (!ok) return;
+  const ref = useRef(null);
+
+  const [visible, setVisible] =
+    useState(false);
+
+  useEffect(() => {
+    const el = ref.current;
+
+    if (!el) return;
+
+    const obs =
+      new IntersectionObserver(
+        (entries) => {
+          entries.forEach((e) =>
+            setVisible(
+              e.isIntersecting
+            )
+          );
+        },
+        {
+          threshold: 0.1,
+        }
+      );
+
+    obs.observe(el);
+
+    return () =>
+      obs.disconnect();
+  }, []);
+
+  useEffect(() => {
+    const loadImage = async () => {
+      try {
+        if (!visible) return;
+
+        const first =
+          (
+            order?.items || []
+          )[0];
+
+        const localRaw =
+          first?.image ||
+          first?.photo ||
+          first?.imageUrl;
+
+        if (localRaw) {
+          if (
+            String(
+              localRaw
+            ).startsWith(
+              "http"
+            )
+          ) {
+            setImageUrl(
+              localRaw
+            );
+          } else {
+            const base =
+              import.meta.env
+                .VITE_CLOUDINARY_BASE_URL ||
+              "https://res.cloudinary.com/db5rnorif/image/upload/";
+
+            setImageUrl(
+              `${base}${String(
+                localRaw
+              ).replace(
+                /^\/+/,
+                ""
+              )}`
+            );
+          }
+
+          return;
+        }
+
+        const menuItemId =
+          first?.menuItemId ||
+          first?.menuItem ||
+          first?._id;
+
+        if (!menuItemId) return;
+
+        const res =
+          await getMenuItemById(
+            menuItemId
+          );
+
+        const raw =
+          res?.image ||
+          res?.photo ||
+          res?.imageUrl;
+
+        if (!raw) return;
+
+        if (
+          String(raw).startsWith(
+            "http"
+          )
+        ) {
+          setImageUrl(raw);
+        } else {
+          const base =
+            import.meta.env
+              .VITE_CLOUDINARY_BASE_URL ||
+            "https://res.cloudinary.com/db5rnorif/image/upload/";
+
+          setImageUrl(
+            `${base}${String(
+              raw
+            ).replace(
+              /^\/+/,
+              ""
+            )}`
+          );
+        }
+      } catch (e) {
+        console.log(e);
+      }
+    };
+
+    loadImage();
+  }, [order, visible]);
+
+  const total = (
+    order?.items || []
+  ).reduce(
+    (s, it) =>
+      s +
+      (it.price ||
+        it.unitPrice ||
+        0) *
+        (it.quantity || 1),
+    0
+  );
+
+  const handleCancel =
+    async () => {
+      const ok =
+        window.confirm(
+          "¿Confirmar eliminar el pedido?"
+        );
+
+      if (!ok) return;
+
+      try {
+        const res =
+          await deleteOrder(
+            order._id
+          );
+
+        if (res?.remote) {
+          await getOrders();
+        }
+
+        showSuccess(
+          "Pedido eliminado"
+        );
+      } catch (e) {
+        showError(
+          "Error al eliminar pedido"
+        );
+      }
+    };
+
+const handleGenerateInvoice =
+  async () => {
     try {
-      await cancelOrder(order._id);
-    } catch (e) {}
+      await createInvoiceRequest(
+        order._id
+      );
+
+      showSuccess(
+        "Factura generada"
+      );
+
+      setInvoiceOrderIds(
+        (prev) =>
+          new Set([
+            ...prev,
+            String(order._id),
+          ])
+      );
+
+      await getOrders();
+    } catch (e) {
+      console.error(
+        "Factura error:",
+        e?.response || e
+      );
+
+      const serverMsg =
+        e?.response?.data?.message ||
+        e?.response?.data ||
+        e.message;
+
+      const status = e?.response?.status;
+
+      
+      if (status === 409) {
+        try {
+          const invRes = await getInvoiceByOrder(order._id);
+          const invoice = invRes?.data?.data || invRes?.data || invRes;
+          console.info('Factura existente:', invoice);
+          showSuccess('Factura ya existente. Abriendo vista de facturas...');
+          
+          window.location.href = '/customer/invoices';
+          return;
+        } catch (inner) {
+          console.error('Error fetching existing invoice:', inner?.response || inner);
+          showError(serverMsg || 'Error al generar factura');
+          return;
+        }
+      }
+
+      showError(serverMsg || 'Error al generar factura');
+    }
   };
 
   return (
-    <tr className="border-b border-accent/10 hover:bg-bg-page/20 transition">
+    <div
+      ref={ref}
+      className="bg-white rounded-3xl overflow-hidden shadow-lg border border-gray-100"
+    >
+      <div className="h-44 bg-gray-100">
+        {imageUrl ? (
+          <img
+            src={imageUrl}
+            alt="Pedido"
+            className="w-full h-full object-cover"
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center text-gray-400">
+            Sin imagen
+          </div>
+        )}
+      </div>
 
-      <td className="px-6 py-4 font-medium">#{order?._id?.slice(-6) || "----"}</td>
+      <div className="p-5">
+        <h3 className="text-lg font-bold">
+          {order?.restaurantId
+            ?.name ||
+            `Pedido #${order?._id?.slice(
+              -6
+            )}`}
+        </h3>
 
-      <td className="px-6 py-4">
-        {(order?.items || []).map((it) => it?.name).filter(Boolean).join(", ") || "Sin platos"}
-      </td>
+        <p className="mt-2 text-sm text-gray-500 line-clamp-2">
+          {(
+            order?.items || []
+          )
+            .map(
+              (it) => it.name
+            )
+            .join(", ")}
+        </p>
 
-      <td className="px-6 py-4">
-        <div className="flex flex-col">
-          <span>{order?.type || "Sin tipo"}</span>
+        <div className="mt-4 flex items-center justify-between">
+          <div>
+            <div className="text-xl font-bold text-yellow-600">
+              Q{" "}
+              {total.toFixed(2)}
+            </div>
 
-          {order?.tableId?.number && (
-            <span className="text-xs text-text-muted">
-              Mesa #{order.tableId.number}
-            </span>
-          )}
+            <div className="mt-2">
+              <span
+                className={`px-3 py-1 rounded-full text-xs font-bold ${
+                  statusStyle[
+                    order?.status
+                  ] ||
+                  "bg-gray-500/20 text-gray-300"
+                }`}
+              >
+                {order?.status}
+              </span>
+            </div>
+          </div>
+
+          <div className="flex flex-col items-end gap-2">
+            {order?.status !==
+              "CANCELLED" &&
+              order?.status !==
+                "DELIVERED" && (
+                <button
+                  onClick={
+                    handleCancel
+                  }
+                  className="px-4 py-2 rounded-xl border text-sm text-error"
+                >
+                  Cancelar
+                </button>
+              )}
+
+            {order?.status ===
+              "DELIVERED" && (
+              <div className="flex gap-2">
+                <button
+                  onClick={
+                    handleGenerateInvoice
+                  }
+                  className="px-4 py-2 rounded-xl bg-accent text-bg-dark"
+                >
+                  Generar factura
+                </button>
+
+                <button
+                  onClick={async () => {
+                    try {
+                      const rawRating = window.prompt('Calificación (1-5):');
+                      if (!rawRating) return;
+                      const rating = Math.max(1, Math.min(5, Number(rawRating)));
+                      if (!rating || rating < 1 || rating > 5) {
+                        alert('Calificación inválida');
+                        return;
+                      }
+                      const comment = window.prompt('Comentario (opcional):') || '';
+
+                      const payload = {
+                        orderId: order._id,
+                        restaurantId: order.restaurantId?._id || order.restaurantId,
+                        rating,
+                        comment,
+                      };
+
+                      await createReviewRequest(payload);
+                      showSuccess('Gracias por calificar el restaurante');
+                    } catch (e) {
+                      const status = e?.response?.status;
+                      if (status === 409) {
+                        showError('Ya existe una reseña para esta orden');
+                      } else {
+                        showError('Error al enviar reseña');
+                      }
+                    }
+                  }}
+                  className="px-4 py-2 rounded-xl bg-green-600 text-white"
+                >
+                  Calificar
+                </button>
+              </div>
+            )}
+          </div>
         </div>
-      </td>
-
-      <td className="px-6 py-4">
-        <span
-          className={`px-3 py-1 rounded-full text-xs font-bold ${
-            statusStyle[order?.status] || "bg-gray-500/20 text-gray-300"
-          }`}
-        >
-          {order?.status || "SIN ESTADO"}
-        </span>
-      </td>
-
-      <td className="px-6 py-4">
-        <div className="flex flex-wrap items-center gap-3 md:justify-end">
-
-          <button
-            onClick={() => onEdit && onEdit(order)}
-            className="inline-flex items-center gap-2 rounded-lg bg-bg-page/50 hover:bg-accent/10 border border-accent/20 px-4 py-2 text-xs font-semibold text-accent transition-colors"
-          >
-            Editar
-          </button>
-
-          <button
-            onClick={handleCancel}
-            className="inline-flex items-center gap-2 rounded-lg border border-error/30 bg-error/5 hover:bg-error/10 px-4 py-2 text-xs font-semibold text-error transition-colors"
-          >
-            Cancelar
-          </button>
-
-          <button
-            onClick={() => updateStatus(order?._id, "PREPARING")}
-            className="inline-flex items-center gap-2 rounded-lg border border-yellow-500/30 bg-yellow-500/10 hover:bg-yellow-500/20 px-4 py-2 text-xs font-semibold text-yellow-600 transition-colors"
-          >
-            Preparando
-          </button>
-
-          <button
-            onClick={() => updateStatus(order?._id, "READY")}
-            className="inline-flex items-center gap-2 rounded-lg border border-blue-500/30 bg-blue-500/10 hover:bg-blue-500/20 px-4 py-2 text-xs font-semibold text-blue-600 transition-colors"
-          >
-            Listo
-          </button>
-
-          <button
-            onClick={() => updateStatus(order?._id, "DELIVERED")}
-            className="inline-flex items-center gap-2 rounded-lg border border-green-500/30 bg-green-500/10 hover:bg-green-500/20 px-4 py-2 text-xs font-semibold text-green-600 transition-colors"
-          >
-            Entregado
-          </button>
-
-        </div>
-      </td>
-
-    </tr>
+      </div>
+    </div>
   );
-};*/
+};
+
+export default OrdersPage;

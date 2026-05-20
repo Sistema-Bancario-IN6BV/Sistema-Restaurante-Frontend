@@ -27,7 +27,7 @@ export const EditOrderModal = ({ isOpen, onClose, order }) => {
     setDeliveryCity(order?.deliveryAddress?.city || "");
     setDeliveryNotes(order?.deliveryAddress?.notes || "");
     fetchTables(order?.restaurantId || user?.restaurantId || user?.restaurant);
-    // initialize selected items from order
+    
     const initItems = (order?.items || []).map((it) => ({
       _id: it?.menuItemId || it?._id || it?.id,
       name: it?.name || "",

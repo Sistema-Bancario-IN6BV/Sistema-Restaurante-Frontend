@@ -41,7 +41,6 @@ const menuItemsByRole = {
         { label: "Restaurantes", to: "/customer/restaurants", icon: BuildingStorefrontIcon },
         { label: "Mis Reservas", to: "/customer/reservations", icon: CalendarDaysIcon },
         { label: "Mis Pedidos", to: "/customer/orders", icon: ShoppingBagIcon },
-        { label: "Mis Facturas", to: "/customer/invoices", icon: ReceiptPercentIcon },
     ],
 };
 

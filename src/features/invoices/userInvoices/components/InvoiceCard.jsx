@@ -1,8 +1,7 @@
 import { useState } from "react";
 import { useInvoiceStore } from "../store/useInvoiceStore";
+import DeleteOrPrint from '../../components/DeleteOrPrint.jsx';
 export const InvoiceCard = ({ invoice }) => {
-
-  const { payInvoice } = useInvoiceStore();
   const [paymentMethod, setPaymentMethod] = useState("CARD");
 
   const handlePrint = () => {
@@ -338,29 +337,7 @@ export const InvoiceCard = ({ invoice }) => {
 
       <div className="flex gap-3 mt-6">
 
-        {invoice.status === "PENDING" && (
-
-          <button
-            onClick={() =>
-              payInvoice(invoice._id, paymentMethod)
-            }
-            className="bg-green-600 hover:bg-green-700 transition text-white px-5 py-2 rounded-xl font-semibold"
-          >
-
-            Pagar
-
-          </button>
-
-        )}
-
-        <button
-          onClick={handlePrint}
-          className="bg-accent hover:bg-gold-light transition text-bg-dark px-5 py-2 rounded-xl font-semibold"
-        >
-
-          Imprimir
-
-        </button>
+        <DeleteOrPrint invoice={invoice} />
 
       </div>
 

@@ -1,13 +1,27 @@
 import { axiosAdmin } from './api.js';
 
+const menuItemCache = new Map();
+
 export const getAllMenuItems = async (restaurantId, params = {}) => {
     const response = await axiosAdmin.get(`/menu/restaurants/${restaurantId}/menu`, { params });
     return response.data;
 };
 
 export const getMenuItemById = async (itemId) => {
+    if (!itemId) return null;
+    // Return cached copy when available to avoid repeated network requests
+    if (menuItemCache.has(String(itemId))) {
+        return menuItemCache.get(String(itemId));
+    }
+
     const response = await axiosAdmin.get(`/menu/${itemId}`);
-    return response.data?.data || response.data;
+    const data = response.data?.data || response.data;
+    try {
+        menuItemCache.set(String(itemId), data);
+    } catch (e) {
+        // ignore cache errors
+    }
+    return data;
 };
 
 export const createMenuItem = async (restaurantId, formData) => {

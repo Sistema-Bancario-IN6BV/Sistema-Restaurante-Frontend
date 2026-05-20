@@ -28,6 +28,18 @@ export const useInvoiceStore = create((set, get) => ({
     }
   },
 
+    deleteInvoice: async (id) => {
+      try {
+        const res = await (await import("../../../shared/api/invoices.js")).deleteInvoice(id);
+        
+        set({ invoices: get().invoices.filter((i) => i._id !== id) });
+        return res.data || res;
+      } catch (error) {
+        set({ error: error.response?.data?.message });
+        throw error;
+      }
+    },
+
   payInvoice: async (id, paymentMethod) => {
     try {
       const response = await payInvoiceRequest(id, paymentMethod);

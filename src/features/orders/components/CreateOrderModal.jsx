@@ -15,7 +15,7 @@ export const CreateOrderModal = ({ isOpen, onClose }) => {
   const [menuItems, setMenuItems] = useState([]);
   const [search, setSearch] = useState("");
   const [selectedItems, setSelectedItems] = useState([]);
-  // must match backend enum: 'DINE_IN', 'DELIVERY', 'TAKEOUT'
+  
   const [type, setType] = useState("DINE_IN");
   const [table, setTable] = useState("");
   const [tables, setTables] = useState([]);
@@ -26,12 +26,12 @@ export const CreateOrderModal = ({ isOpen, onClose }) => {
 
   useEffect(() => {
     if (!isOpen) return;
-    // reset
+    
     setSelectedItems([]);
     setSearch("");
     setType("DINE_IN");
     setTable("");
-    // Prefer restaurantId from authenticated user to immediately load menu
+    
     if (user?.restaurantId || user?.restaurant) {
       const rid = user.restaurantId || user.restaurant;
       setSelectedRestaurant(rid);
@@ -50,7 +50,7 @@ export const CreateOrderModal = ({ isOpen, onClose }) => {
       if (list.length > 0) setSelectedRestaurant((prev) => prev || list[0]._id || list[0].id);
     } catch (e) {
       console.error("Error fetching restaurants", e);
-      // fallback: use restaurantId from authenticated user if available
+      
       if (user?.restaurantId || user?.restaurant) {
         setSelectedRestaurant(user.restaurantId || user.restaurant);
       }
@@ -68,7 +68,7 @@ export const CreateOrderModal = ({ isOpen, onClose }) => {
       const res = await getAllMenuItems(restaurantId);
       const data = res.data || res;
       const list = Array.isArray(data) ? data : Object.values(data).flat();
-      // try fetch ingredients to compute max availability per menu item
+      
       try {
         const ingrRes = await axiosAdmin.get(`/ingredients/restaurant/${restaurantId}`);
         const ingrData = ingrRes?.data || [];
@@ -100,7 +100,7 @@ export const CreateOrderModal = ({ isOpen, onClose }) => {
   const fetchTables = async (restaurantId) => {
     try {
       const res = await getTables({ restaurantId });
-      // getTables returns { data: ... } in our api helper
+      
       const data = res?.data || res;
       const list = Array.isArray(data) ? data : data?.tables || data?.data || [];
       setTables(list);
@@ -165,7 +165,7 @@ export const CreateOrderModal = ({ isOpen, onClose }) => {
       };
       const res = await createOrder(payload);
       showSuccess(res?.message || 'Pedido creado');
-      // refresh orders list
+      
       try { useOrderStore.getState().getOrders(); } catch (e) {}
       onClose();
     } catch (e) {

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useInvoiceStore } from "../store/useInvoiceStore";
+import { useAuthStore } from "../../auth/store/authStore";
 export const InvoiceCard = ({ invoice }) => {
 
   const { payInvoice } = useInvoiceStore();
@@ -158,17 +159,14 @@ export const InvoiceCard = ({ invoice }) => {
             </div>
 
             <div class="info">
-
               <div>
                 <strong>Fecha:</strong>
                 ${new Date(invoice.createdAt).toLocaleDateString()}
               </div>
-
               <div>
                 <strong>Método:</strong>
                 ${invoice.paymentMethod || paymentMethod}
               </div>
-
             </div>
 
             <div class="section-title">
@@ -189,15 +187,17 @@ export const InvoiceCard = ({ invoice }) => {
 
               <tbody>
 
-                ${invoice.items.map(item => `
-
+                ${invoice.items.map(item => {
+                  const unit = Number(item.unitPrice ?? item.price ?? item.unit_price ?? 0);
+                  const subtotal = unit * (Number(item.quantity) || 1);
+                  return `
                   <tr>
                     <td>${item.name}</td>
                     <td>x${item.quantity}</td>
-                    <td>Q${Number(item.subtotal).toFixed(2)}</td>
+                    <td>Q${subtotal.toFixed(2)}</td>
                   </tr>
-
-                `).join("")}
+                `
+                }).join("")}
 
               </tbody>
 
@@ -206,7 +206,7 @@ export const InvoiceCard = ({ invoice }) => {
             <div class="total-box">
 
               <div class="total">
-                TOTAL Q${Number(invoice.total).toFixed(2)}
+                TOTAL Q${Number((invoice.items || []).reduce((s,it)=> s + (Number(it.unitPrice ?? it.price ?? it.unit_price ?? 0) * (Number(it.quantity)||1)),0)).toFixed(2)}
               </div>
 
             </div>
@@ -225,6 +225,8 @@ export const InvoiceCard = ({ invoice }) => {
     printWindow.document.close();
     printWindow.print();
   };
+
+  const user = useAuthStore((s) => s.user);
 
   return (
 
@@ -303,7 +305,11 @@ export const InvoiceCard = ({ invoice }) => {
 
       <div className="mt-5 space-y-2">
 
-        {invoice.items.map((item, i) => (
+        {invoice.items.map((item, i) => {
+          const unit = Number(item.unitPrice ?? item.price ?? item.unit_price ?? 0);
+          const subtotal = unit * (Number(item.quantity) || 1);
+
+          return (
 
           <div
             key={i}
@@ -318,39 +324,36 @@ export const InvoiceCard = ({ invoice }) => {
 
             </div>
 
-            <div className="text-right">
+              <div className="text-right">
 
-              <p className="font-semibold">
-                x{item.quantity}
-              </p>
+                <p className="font-semibold">
+                  x{item.quantity}
+                </p>
 
-              <p className="text-sm text-text-muted">
-                Q{Number(item.subtotal).toFixed(2)}
-              </p>
+                <p className="text-sm text-text-muted">
+                  Q{subtotal.toFixed(2)}
+                </p>
+
+              </div>
 
             </div>
 
-          </div>
-
-        ))}
+          )
+        })}
 
       </div>
 
       <div className="flex gap-3 mt-6">
 
-        {invoice.status === "PENDING" && (
-
+        {invoice.status === "PENDING" && user?.role !== 'CUSTOMER' && (
           <button
             onClick={() =>
               payInvoice(invoice._id, paymentMethod)
             }
             className="bg-green-600 hover:bg-green-700 transition text-white px-5 py-2 rounded-xl font-semibold"
           >
-
             Pagar
-
           </button>
-
         )}
 
         <button

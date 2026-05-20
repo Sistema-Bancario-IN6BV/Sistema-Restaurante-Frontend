@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 import {
     MapPinIcon
@@ -8,10 +9,12 @@ import {
     useUserRestaurantStore
 } from "../store/useUserRestaurantStore";
 
-import {CreateUserRestaurantModal} from "./createUserRestaurantModal";
+import { CreateUserRestaurantModal } from "./createUserRestaurantModal";
 import { RestaurantDetailsModal } from "./RestaurantDetailsModal";
 
 export const UserRestaurant = () => {
+
+    const navigate = useNavigate();
 
     const {
         restaurants,
@@ -22,8 +25,9 @@ export const UserRestaurant = () => {
     const [openModal, setOpenModal] = useState(false);
 
     const [selectedRestaurant, setSelectedRestaurant] = useState(null);
-    
+
     const [openDetails, setOpenDetails] = useState(false);
+    const [search, setSearch] = useState("");
 
     useEffect(() => {
         getRestaurants();
@@ -61,10 +65,22 @@ export const UserRestaurant = () => {
                 </div>
             )}
 
+            {/* SEARCH */}
+            <div className="mb-4">
+                <input
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    placeholder="Buscar restaurante por nombre..."
+                    className="w-full px-4 py-3 rounded-xl border border-accent/20 bg-bg-page text-text-body"
+                />
+            </div>
+
             {/* LIST */}
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
 
-                {restaurants.map((restaurant) => (
+                {restaurants
+                    .filter(r => !search || (r.name || '').toLowerCase().includes(search.toLowerCase()))
+                    .map((restaurant) => (
 
                     <div
                         key={restaurant._id}
@@ -116,7 +132,6 @@ export const UserRestaurant = () => {
 
                             <div className="mt-2 flex items-center gap-2 text-sm text-gray-500">
                                 <MapPinIcon className="h-4 w-4" />
-
                                 {restaurant.address?.city}
                             </div>
 
@@ -125,9 +140,16 @@ export const UserRestaurant = () => {
 
                                 <button
                                     onClick={() => handleOpenDetails(restaurant)}
-                                    className="flex-1 rounded-xl border border-gray-300 px-3 py-2 text-sm font-semibold hover:bg-gray-100 transition"
+                                    className="flex-1 rounded-xl border border-yellow-500 px-3 py-2 text-sm font-semibold text-yellow-600 hover:bg-yellow-50 transition"
                                 >
-                                    Detalles
+                                    Ver Detalles
+                                </button>
+
+                                <button
+                                    onClick={() => navigate(`/customer/menu/${restaurant._id}`)}
+                                    className="flex-1 rounded-xl border border-yellow-500 px-3 py-2 text-sm font-semibold text-yellow-600 hover:bg-yellow-50 transition"
+                                >
+                                    Ir a Menú
                                 </button>
 
                                 <button
@@ -137,11 +159,6 @@ export const UserRestaurant = () => {
                                     Reservar
                                 </button>
 
-                                <button
-                                    className="flex-1 rounded-xl border border-yellow-500 px-3 py-2 text-sm font-semibold text-yellow-600 hover:bg-yellow-50 transition"
-                                >
-                                    Ir a Menú
-                                </button>
                             </div>
                         </div>
                     </div>

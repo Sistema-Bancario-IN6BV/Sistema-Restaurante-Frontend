@@ -1,12 +1,12 @@
-/*import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { getTables } from "../../../../shared/api/tables.js";
 import { getAllMenuItems } from "../../../../shared/api/menuItems.js";
-import { useOrderStore } from "../store/useUserOrderStore.js";
-import { useAuthStore } from "../../../auth/store/useAuthStore.js";
-import { showError, showSuccess } from "../../../../shared/utils/notifications.js";
+import { useUserOrderStore } from "../store/useUserOrderStore.js";
+import { useAuthStore } from "../../../auth/store/authStore.js";
+import { showError, showSuccess } from "../../../../shared/utils/toast.js";
 
 export const UserEditOrderModal = ({ isOpen, onClose, order }) => {
-  const { updateOrder } = useOrderStore();
+  const { updateOrder } = useUserOrderStore();
   const { user } = useAuthStore();
 
   const [type, setType] = useState(order?.type || "DINE_IN");
@@ -27,7 +27,7 @@ export const UserEditOrderModal = ({ isOpen, onClose, order }) => {
     setDeliveryCity(order?.deliveryAddress?.city || "");
     setDeliveryNotes(order?.deliveryAddress?.notes || "");
     fetchTables(order?.restaurantId || user?.restaurantId || user?.restaurant);
-    // initialize selected items from order
+    
     const initItems = (order?.items || []).map((it) => ({
       _id: it?.menuItemId || it?._id || it?.id,
       name: it?.name || "",
@@ -216,4 +216,4 @@ export const UserEditOrderModal = ({ isOpen, onClose, order }) => {
       </div>
     </div>
   );
-}; */ 
+};
