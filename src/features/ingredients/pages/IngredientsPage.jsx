@@ -1,98 +1,19 @@
 import { useEffect, useMemo, useState } from "react";
-import { useIngredientStore } from "../store/useIngredientStore.js";
+import { useIngredientStore } from "../store/useIngredientStore";
 import { showSuccess, showError } from "../../../shared/utils/toast.js";
+import { IngredientModal } from "../components/IngredientModal";
 
 const PAGE_SIZE = 8;
 
-const UNITS = ["KG", "G", "LT", "ML", "UNIT", "DOZEN", "POUND", "OZ"];
-
-const IngredientModal = ({ isOpen, onClose, onSave, loading, ingredient = null }) => {
-    const isEditing = Boolean(ingredient);
-    const [form, setForm] = useState({ name: "", unit: "KG", currentStock: 0, minStock: 0, costPerUnit: 0, supplier: "" });
-
-    useEffect(() => {
-        if (isOpen) {
-            setForm(ingredient ? {
-                name: ingredient.name || "",
-                unit: ingredient.unit || "KG",
-                currentStock: ingredient.currentStock ?? 0,
-                minStock: ingredient.minStock ?? 0,
-                costPerUnit: ingredient.costPerUnit ?? 0,
-                supplier: ingredient.supplier || "",
-            } : { name: "", unit: "KG", currentStock: 0, minStock: 0, costPerUnit: 0, supplier: "" });
-        }
-    }, [isOpen, ingredient]);
-
-    if (!isOpen) return null;
-
-    const set = (k, v) => setForm((p) => ({ ...p, [k]: v }));
-
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        if (!form.name.trim()) return showError("El nombre es obligatorio");
-        const ok = await onSave(form);
-        if (ok) { setForm({ name: "", unit: "KG", currentStock: 0, minStock: 0, costPerUnit: 0, supplier: "" }); onClose(); }
-    };
-
-    return (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex justify-center items-center z-50 px-3">
-            <div className="bg-[#f6f1e8] rounded-2xl shadow-2xl border border-accent/20 w-full max-w-lg overflow-hidden">
-                <div className="p-5 bg-accent text-bg-dark">
-                    <h2 className="text-xl font-bold font-serif">{isEditing ? "Editar Ingrediente" : "Nuevo Ingrediente"}</h2>
-                </div>
-                <form onSubmit={handleSubmit} className="p-5 space-y-4 bg-[#fffaf2]">
-                    <div>
-                        <label className="block text-xs font-bold uppercase tracking-wide text-text-body mb-1">Nombre *</label>
-                        <input value={form.name} onChange={(e) => set("name", e.target.value)} placeholder="Tomate, Harina..." className="w-full px-4 py-3 bg-bg-page border border-accent/20 rounded-lg text-text-body focus:outline-none focus:border-accent" />
-                    </div>
-                    <div className="grid grid-cols-2 gap-4">
-                        <div>
-                            <label className="block text-xs font-bold uppercase tracking-wide text-text-body mb-1">Unidad *</label>
-                            <select value={form.unit} onChange={(e) => set("unit", e.target.value)} className="w-full px-4 py-3 bg-bg-page border border-accent/20 rounded-lg text-text-body focus:outline-none focus:border-accent cursor-pointer">
-                                {UNITS.map((u) => <option key={u} value={u}>{u}</option>)}
-                            </select>
-                        </div>
-                        <div>
-                            <label className="block text-xs font-bold uppercase tracking-wide text-text-body mb-1">Costo/Unidad</label>
-                            <input type="number" min="0" step="0.01" value={form.costPerUnit} onChange={(e) => set("costPerUnit", e.target.value)} className="w-full px-4 py-3 bg-bg-page border border-accent/20 rounded-lg text-text-body focus:outline-none focus:border-accent" />
-                        </div>
-                    </div>
-                    <div className="grid grid-cols-2 gap-4">
-                        <div>
-                            <label className="block text-xs font-bold uppercase tracking-wide text-text-body mb-1">Stock Actual</label>
-                            <input type="number" min="0" step="0.01" value={form.currentStock} onChange={(e) => set("currentStock", e.target.value)} disabled={isEditing} className="w-full px-4 py-3 bg-bg-page border border-accent/20 rounded-lg text-text-body focus:outline-none focus:border-accent disabled:opacity-50" />
-                            {isEditing && <p className="text-xs text-text-muted mt-1">Usa "Reabastecer" para cambiar stock</p>}
-                        </div>
-                        <div>
-                            <label className="block text-xs font-bold uppercase tracking-wide text-text-body mb-1">Stock Mínimo *</label>
-                            <input type="number" min="0" step="0.01" value={form.minStock} onChange={(e) => set("minStock", e.target.value)} className="w-full px-4 py-3 bg-bg-page border border-accent/20 rounded-lg text-text-body focus:outline-none focus:border-accent" />
-                        </div>
-                    </div>
-                    <div>
-                        <label className="block text-xs font-bold uppercase tracking-wide text-text-body mb-1">Proveedor</label>
-                        <input value={form.supplier} onChange={(e) => set("supplier", e.target.value)} placeholder="Nombre del proveedor..." className="w-full px-4 py-3 bg-bg-page border border-accent/20 rounded-lg text-text-body focus:outline-none focus:border-accent" />
-                    </div>
-                    <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-3 pt-2 border-t border-accent/10">
-                        <button type="button" onClick={onClose} className="px-6 py-2.5 rounded-xl border border-accent/20 bg-bg-page hover:bg-accent/10 text-text-body font-bold transition-colors">Cancelar</button>
-                        <button type="submit" disabled={loading} className="px-6 py-2.5 rounded-xl bg-accent text-bg-dark font-bold hover:bg-gold-light transition-colors disabled:opacity-50 flex items-center justify-center gap-2">
-                            {loading ? <span className="inline-block w-4 h-4 border-2 border-bg-dark border-t-transparent rounded-full animate-spin" /> : isEditing ? "Guardar cambios" : "Crear ingrediente"}
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    );
-};
-
-export const Ingredients = () => {
-    const { ingredients, loading, error, fetchIngredients, createIngredient, updateIngredient, deleteIngredient } = useIngredientStore();
+export const IngredientsPage = () => {
+    const { ingredients, loading, error, getIngredients, deleteIngredient } = useIngredientStore();
     const [search, setSearch] = useState("");
     const [page, setPage] = useState(1);
     const [modalOpen, setModalOpen] = useState(false);
     const [selected, setSelected] = useState(null);
     const [deleteTarget, setDeleteTarget] = useState(null);
 
-    useEffect(() => { fetchIngredients(); }, [fetchIngredients]);
+    useEffect(() => { getIngredients(); }, [getIngredients]);
     useEffect(() => { if (error) showError(error); }, [error]);
 
     const filtered = useMemo(() => {
@@ -105,21 +26,12 @@ export const Ingredients = () => {
     const currentPage = Math.min(page, totalPages);
     const paginated = useMemo(() => filtered.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE), [filtered, currentPage]);
 
-    const handleSave = async (values) => {
-        if (selected) {
-            const res = await updateIngredient(selected._id, values);
-            if (res.success) { showSuccess("Ingrediente actualizado"); return true; }
-            showError(res.error); return false;
-        }
-        const res = await createIngredient(values);
-        if (res.success) { showSuccess("Ingrediente creado"); return true; }
-        showError(res.error); return false;
-    };
-
     const handleDelete = async (id) => {
         const res = await deleteIngredient(id);
-        if (res.success) { showSuccess("Ingrediente eliminado"); setDeleteTarget(null); }
-        else showError(res.error);
+        if (res.success) { 
+            showSuccess("Ingrediente eliminado"); 
+            setDeleteTarget(null); 
+        }
     };
 
     return (
@@ -134,7 +46,6 @@ export const Ingredients = () => {
                 </button>
             </div>
 
-            {/* Alertas de stock bajo */}
             {ingredients.filter(i => i.lowStockAlert).length > 0 && (
                 <div className="mb-5 bg-error/5 border border-error/20 rounded-xl p-4">
                     <p className="text-sm font-bold text-error mb-2">⚠️ {ingredients.filter(i => i.lowStockAlert).length} ingrediente(s) con stock bajo</p>
@@ -197,6 +108,7 @@ export const Ingredients = () => {
                         </tbody>
                     </table>
                 </div>
+                {/* Paginación */}
                 <div className="flex items-center justify-between px-6 py-4 border-t border-accent/10 bg-bg-page/20">
                     <p className="text-xs text-text-muted">Mostrando {(currentPage - 1) * PAGE_SIZE + (paginated.length ? 1 : 0)} - {(currentPage - 1) * PAGE_SIZE + paginated.length} de {filtered.length}</p>
                     <div className="flex gap-2">
@@ -207,7 +119,7 @@ export const Ingredients = () => {
                 </div>
             </div>
 
-            <IngredientModal isOpen={modalOpen} onClose={() => { setModalOpen(false); setSelected(null); }} onSave={handleSave} loading={loading} ingredient={selected} />
+            <IngredientModal isOpen={modalOpen} onClose={() => { setModalOpen(false); setSelected(null); }} ingredient={selected} />
 
             {deleteTarget && (
                 <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex justify-center items-center z-50 px-3">
