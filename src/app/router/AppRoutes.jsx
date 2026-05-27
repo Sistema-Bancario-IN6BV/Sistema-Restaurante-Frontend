@@ -4,6 +4,7 @@ import { Routes, Route, Navigate, Outlet } from "react-router-dom";
 import { AuthPage } from "../../features/auth/pages/AuthPage.jsx";
 import { RequireAuth } from "./RequireAuth.jsx";
 import { Profile } from "../../features/users/pages/Profile.jsx";
+import { ResetPasswordPage } from "../../features/auth/pages/ResetPasswordPage.jsx";
 
 import { Users } from "../../features/users/components/Users.jsx";
 import { Restaurants } from "../../features/restaurants/components/Restaurants.jsx";
@@ -38,6 +39,7 @@ export const AppRoutes = () => {
             <Route path="/" element={<AuthPage />} />
             <Route path="/verify-email" element={<VerifyEmailPage />} />
             <Route path="/unauthorized" element={<UnauthorizedPage />} />
+            <Route path="/reset-password" element={<ResetPasswordPage />} />
 
             {/* PROTECTED ROUTES + ROLE */}
             <Route
