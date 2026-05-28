@@ -17,6 +17,8 @@ export const CartPage = () => {
         removeFromCart,
         clearCart,
         updateQuantity,
+        deliveryAddress,
+        setDeliveryAddress,
     } = useCartStore();
 
     const [loading, setLoading] = useState(false);
@@ -90,14 +92,29 @@ export const CartPage = () => {
                         <div className="text-xs text-gray-400 mt-1">Incluye impuestos si aplica</div>
                     </div>
 
-                    <div className="flex gap-4">
+                                    <div className="w-full md:w-1/2 mt-4 md:mt-0">
+                                            <label className="text-sm text-gray-600">Dirección de entrega</label>
+                                            <textarea value={deliveryAddress || ''} onChange={(e) => setDeliveryAddress(e.target.value)} placeholder="Calle, número, zona, referencias" className="w-full mt-2 p-3 border rounded-lg" rows={3} />
+                                        </div>
+
+                        <div className="flex gap-4">
                         <button onClick={clearCart} className="px-6 py-3 rounded-xl border">Vaciar carrito</button>
                         <div className="flex items-center gap-3">
                             <select value={paymentMethod} onChange={(e) => setPaymentMethod(e.target.value)} className="px-3 py-2 rounded-lg border">
                                 <option value="CARD">Tarjeta</option>
                                 <option value="CASH">Efectivo</option>
                             </select>
-                            <button onClick={async () => { setLoading(true); const result = await useCartStore.getState().checkout({ paymentMethod }); setLoading(false); if (result?.success) navigate('/customer/orders'); }} className="px-6 py-3 rounded-xl bg-yellow-500 text-white font-bold">{loading ? 'Procesando...' : 'Pagar'}</button>
+                            <div className="flex items-center gap-3">
+                                <button onClick={async () => {
+                                    if (!deliveryAddress || !String(deliveryAddress).trim()) {
+                                        return alert('Por favor ingresa la dirección para la entrega');
+                                    }
+                                    setLoading(true);
+                                    const result = await useCartStore.getState().checkout({ paymentMethod, type: 'DELIVERY', address: String(deliveryAddress).trim() });
+                                    setLoading(false);
+                                    if (result?.success) navigate('/customer/orders');
+                                }} className="px-6 py-3 rounded-xl bg-yellow-500 text-white font-bold">{loading ? 'Procesando...' : 'Pagar'}</button>
+                            </div>
                         </div>
                     </div>
                 </div>

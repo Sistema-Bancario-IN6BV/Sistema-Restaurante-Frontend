@@ -31,21 +31,25 @@ export const ReportsPage = () => {
                 setLoading(true);
                 setError(null);
 
-                if (user?.role === "PLATFORM_ADMIN") {
+                const rawRole = user?.role ?? '';
+                console.debug('[ReportsPage] user role / user ->', rawRole, user);
+                const roleNormalized = rawRole.toString().toUpperCase();
+
+                if (roleNormalized.includes('PLATFORM')) {
                     const { data } = await getGlobalReportStats();
                     setStats(data.data);
                     return;
                 }
 
                 // RESTAURANT_ADMIN or other admin roles: fetch restaurant-scoped report
-                if (user?.role === "RESTAURANT_ADMIN") {
+                if (roleNormalized.includes('RESTAURANT')) {
                     const restaurantId = user.restaurantId || user.restaurant;
                     if (!restaurantId) {
                         setError('No se encontró el restaurantId en el usuario');
                         setStats(null);
                         return;
                     }
-                    const { data } = await getDashboardStats(user.role, restaurantId, user.id);
+                    const { data } = await getDashboardStats('RESTAURANT_ADMIN', restaurantId, user.id);
                     // backend returns data shaped under data.data similar to global
                     setStats({ ...(data.data || {}), isRestaurantReport: true, restaurantId });
                     return;
@@ -61,19 +65,20 @@ export const ReportsPage = () => {
         };
 
         loadReports();
-    }, [user?.role]);
+    }, [user?.role, user?.restaurant, user?.restaurantId]);
 
     const handleExport = async (format) => {
         try {
             setExporting(format);
-            if (user?.role === "PLATFORM_ADMIN") {
+            const roleNormalized = (user?.role ?? '').toString().toUpperCase();
+            if (roleNormalized.includes('PLATFORM')) {
                 const response = await exportGlobalReport(format);
                 const filename = format === "pdf" ? "reporte-global.pdf" : "reporte-global.xlsx";
                 downloadBlob(response.data, filename);
                 return;
             }
 
-            if (user?.role === "RESTAURANT_ADMIN") {
+            if (roleNormalized.includes('RESTAURANT')) {
                 const restaurantId = user.restaurantId || user.restaurant;
                 if (!restaurantId) throw new Error('restaurantId missing');
                 const response = await exportRestaurantReport(restaurantId, format);

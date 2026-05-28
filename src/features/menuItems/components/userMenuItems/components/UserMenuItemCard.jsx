@@ -24,9 +24,11 @@ const menuItemImageUrl = (path) => {
 
 export const UserMenuItemCard = ({ item }) => {
 
-    const { addToCart } = useCartStore();
+    const { addToCart, deliveryAddress, setDeliveryAddress } = useCartStore();
     const [open, setOpen] = useState(false);
     const [qty, setQty] = useState(1);
+    const [showAddress, setShowAddress] = useState(false);
+    const [localAddress, setLocalAddress] = useState('');
 
     const imageUrl = menuItemImageUrl(item?.image);
 
@@ -77,7 +79,7 @@ export const UserMenuItemCard = ({ item }) => {
                                 </button>
 
                                 <button
-                                    onClick={() => { addToCart(item, 1); }}
+                                    onClick={() => setShowAddress(true)}
                                     className="rounded-xl bg-yellow-500 px-4 py-2 text-sm font-bold text-white hover:bg-yellow-600 transition"
                                 >
                                     Agregar al carrito
@@ -143,7 +145,7 @@ export const UserMenuItemCard = ({ item }) => {
                                     </div>
 
                                     <button
-                                        onClick={() => { addToCart(item, qty); setOpen(false); setQty(1); }}
+                                        onClick={() => { setShowAddress(true); }}
                                         className="px-4 py-2 bg-yellow-500 text-white rounded"
                                     >
                                         Agregar al carrito
@@ -164,6 +166,38 @@ export const UserMenuItemCard = ({ item }) => {
 
                     </div>
 
+                </div>
+            )}
+
+            {showAddress && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+                    <div className="bg-white rounded-xl max-w-lg w-full p-4">
+                        <div className="flex justify-between items-center mb-4">
+                            <h3 className="text-lg font-bold">Opciones de pedido</h3>
+                            <button onClick={() => setShowAddress(false)} className="p-2">✕</button>
+                        </div>
+
+                        <div className="space-y-3">
+                            <div>
+                                <label className="text-sm">Dirección de entrega</label>
+                                <textarea value={localAddress} onChange={(e) => setLocalAddress(e.target.value)} placeholder="Calle, número, zona, referencias" className="w-full mt-2 p-2 border rounded" rows={3} />
+                            </div>
+
+                            <div className="flex justify-end gap-2">
+                                <button onClick={() => setShowAddress(false)} className="px-4 py-2 border rounded">Cancelar</button>
+                                <button onClick={() => {
+                                    if (!localAddress.trim()) {
+                                        return alert('Por favor ingresa la dirección para la entrega');
+                                    }
+                                    setDeliveryAddress(localAddress.trim());
+                                    addToCart(item, qty);
+                                    setShowAddress(false);
+                                    setOpen(false);
+                                    setQty(1);
+                                }} className="px-4 py-2 bg-yellow-500 text-white rounded">Agregar al carrito</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             )}
         </>

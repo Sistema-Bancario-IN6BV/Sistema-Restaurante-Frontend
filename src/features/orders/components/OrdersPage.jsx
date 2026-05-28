@@ -348,13 +348,31 @@ const OrderRow = ({ order, onEdit }) => {
 
       <td className="px-6 py-4">
         <div className="flex flex-col">
-          <span>{order?.type || "Sin tipo"}</span>
+          <span className="font-semibold">{order?.type || "Sin tipo"}</span>
 
-          {order?.tableId?.number && (
-            <span className="text-xs text-text-muted">
-              Mesa #{order.tableId.number}
-            </span>
-          )}
+          <div className="mt-2 flex items-center gap-2">
+            {order?.tableId?.number && (
+              <button
+                onClick={() => window.alert(`Mesa #${order.tableId.number}`)}
+                className="px-3 py-1 rounded-full text-xs font-bold bg-yellow-50 text-yellow-600 border border-yellow-200"
+              >
+                Mesa #{order.tableId.number}
+              </button>
+            )}
+
+            {order?.deliveryAddress && (
+              <button
+                onClick={() => {
+                  const addr = order.deliveryAddress;
+                  const text = addr?.street ? `${addr.street}${addr.city ? ', ' + addr.city : ''}${addr.state ? ', ' + addr.state : ''}${addr.postalCode ? ' - ' + addr.postalCode : ''}` : JSON.stringify(addr);
+                  window.alert('Dirección de entrega:\n' + text);
+                }}
+                className="px-3 py-1 rounded-full text-xs font-bold bg-blue-50 text-blue-600 border border-blue-200"
+              >
+                Ver dirección
+              </button>
+            )}
+          </div>
         </div>
       </td>
 

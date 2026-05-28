@@ -37,6 +37,9 @@ export const useCartStore = create((set, get) => ({
         }
     },
 
+    deliveryAddress: '',
+    setDeliveryAddress: (addr) => set({ deliveryAddress: addr }),
+
     removeFromCart: (id) => {
         set({ cart: get().cart.filter((item) => {
             const candidates = [item._id, item.id, item.menuItemId, item.menuItem];
@@ -65,9 +68,16 @@ export const useCartStore = create((set, get) => ({
 
             const total = items.reduce((s, it) => s + (it.unitPrice || 0) * (it.quantity || 1), 0);
 
+            const deliveryAddr = opts.address || get().deliveryAddress;
+            let deliveryAddressPayload = undefined;
+            if (deliveryAddr) {
+                deliveryAddressPayload = typeof deliveryAddr === 'string' ? { street: deliveryAddr } : deliveryAddr;
+            }
+
             const payload = {
                 items,
-                type: opts.type || 'TAKEOUT',
+                type: opts.type || 'DELIVERY',
+                deliveryAddress: deliveryAddressPayload,
                 total,
                 restaurantId,
                 paymentMethod: opts.paymentMethod || 'CARD',
