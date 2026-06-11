@@ -16,13 +16,12 @@ import {
 } from "@heroicons/react/24/outline";
 import { useState } from "react";
 
-const customerMenu = [
-  { label: "Inicio", to: "/customer/home", icon: HomeIcon },
+  const customerMenu = [
   { label: "Restaurantes", to: "/customer/restaurants", icon: BuildingStorefrontIcon },
-  { label: "Menú", to: "/customer/menu", icon: BookOpenIcon },
   { label: "Mis Reservas", to: "/customer/reservations", icon: CalendarDaysIcon },
   { label: "Mis Pedidos", to: "/customer/orders", icon: ShoppingBagIcon },
-  { label: "Mis Facturas", to: "/customer/invoices", icon: ReceiptPercentIcon },
+  { label: "Eventos", to: "/customer/events", icon: CalendarDaysIcon },
+  
 ];
 
 export const CustomerNavbar = () => {
@@ -55,7 +54,7 @@ export const CustomerNavbar = () => {
                 const active = location.pathname === item.to || location.pathname.startsWith(item.to + "/");
                 return (
                   <Link
-                    key={item.to}
+                    key={`${item.to}-${item.label}`}
                     to={item.to}
                     className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-transform transform hover:scale-105 active:scale-95 hover:shadow-sm ${
                       active
@@ -85,7 +84,6 @@ export const CustomerNavbar = () => {
               <div className="hidden sm:flex items-center">
                 <CartBadge />
               </div>
-              <MessagesBadge />
               <AvatarUser />
             </>
           )}

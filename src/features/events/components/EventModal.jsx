@@ -75,7 +75,7 @@ export const EventModal = ({ isOpen, onClose, event, onSave }) => {
     return (
         <div className="fixed inset-0 bg-base-espresso/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
             <div className="bg-[#F2EAE0] rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto border border-[#E8DFD0]">
-                {/* Header */}
+                {}
                 <div className="bg-[#1C1008] px-6 py-4 rounded-t-2xl">
                     <h2 className="text-xl font-bold text-[#FAF6F0] font-serif">
                         {event ? "Editar Evento" : "Nuevo Evento"}
@@ -85,9 +85,9 @@ export const EventModal = ({ isOpen, onClose, event, onSave }) => {
                     </p>
                 </div>
 
-                {/* Form */}
+                {}
                 <form onSubmit={handleSubmit} className="p-6 space-y-4">
-                    {/* Título */}
+                    {}
                     <div>
                         <label className="block text-[#3A2418] font-semibold text-sm mb-1">
                             Nombre del Evento *
@@ -103,7 +103,7 @@ export const EventModal = ({ isOpen, onClose, event, onSave }) => {
                         />
                     </div>
 
-                    {/* Descripción */}
+                    {}
                     <div>
                         <label className="block text-[#3A2418] font-semibold text-sm mb-1">
                             Descripción
@@ -118,7 +118,7 @@ export const EventModal = ({ isOpen, onClose, event, onSave }) => {
                         />
                     </div>
 
-                    {/* Fecha y Horas */}
+                    {}
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div>
                             <label className="block text-[#3A2418] font-semibold text-sm mb-1">
@@ -161,7 +161,7 @@ export const EventModal = ({ isOpen, onClose, event, onSave }) => {
                         </div>
                     </div>
 
-                    {/* Capacidad y Precio */}
+                    {}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label className="block text-[#3A2418] font-semibold text-sm mb-1">
@@ -195,7 +195,7 @@ export const EventModal = ({ isOpen, onClose, event, onSave }) => {
                         </div>
                     </div>
 
-                    {/* Estado (solo para editar) */}
+                    {}
                     {event && (
                         <div>
                             <label className="block text-[#3A2418] font-semibold text-sm mb-1">
@@ -216,7 +216,7 @@ export const EventModal = ({ isOpen, onClose, event, onSave }) => {
                         </div>
                     )}
 
-                    {/* Servicios */}
+                    {}
                     <div>
                         <label className="block text-[#3A2418] font-semibold text-sm mb-1">
                             Servicios (separados por coma)
@@ -231,7 +231,7 @@ export const EventModal = ({ isOpen, onClose, event, onSave }) => {
                         />
                     </div>
 
-                    {/* Tags */}
+                    {}
                     <div>
                         <label className="block text-[#3A2418] font-semibold text-sm mb-1">
                             Tags (separados por coma)
@@ -246,7 +246,7 @@ export const EventModal = ({ isOpen, onClose, event, onSave }) => {
                         />
                     </div>
 
-                    {/* Botones */}
+                    {}
                     <div className="flex justify-end gap-3 pt-4 border-t border-[#E8DFD0]">
                         <button
                             type="button"

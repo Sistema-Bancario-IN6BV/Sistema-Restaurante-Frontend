@@ -60,7 +60,13 @@ export const useAuthStore = create(
                 try {
                     set({ loading: true, error: null });
 
-                    const { data } = await loginRequest({ emailOrUsername, password })
+                    const normalizedEmailOrUsername = String(emailOrUsername || "").trim();
+                    const normalizedPassword = String(password || "");
+
+                    const { data } = await loginRequest({
+                        emailOrUsername: normalizedEmailOrUsername,
+                        password: normalizedPassword
+                    })
                     console.log(data)
 
                     set({

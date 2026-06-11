@@ -10,7 +10,7 @@ export const ForgotPasswordForm = ({ onSwitch }) => {
   const { register, handleSubmit, formState: { errors } } = useForm();
 
   const onSubmit = async (data) => {
-    const res = await forgotPassword({ email: data.email });
+    const res = await forgotPassword(data.email);
     
     if (res.success) {
       toast.success("Si el correo existe, recibirás instrucciones pronto.", {

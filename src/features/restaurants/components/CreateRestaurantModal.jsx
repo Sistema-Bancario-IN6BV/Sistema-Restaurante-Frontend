@@ -96,8 +96,21 @@ export const CreateRestaurantModal = ({
         formData.append("address[state]", values.state || "");
         formData.append("address[zipCode]", values.zipCode || "");
 
-        // Tags as JSON array string
-        const tagsArray = values.tags ? values.tags.split(",").map(t => t.trim()).filter(Boolean) : [];
+        // Normalize tags: accept JSON string or comma-separated input and send JSON stringified array once
+        let tagsArray = [];
+        if (values.tags) {
+            const s = values.tags.trim();
+            if (s.startsWith("[")) {
+                try {
+                    const parsed = JSON.parse(s);
+                    if (Array.isArray(parsed)) tagsArray = parsed.map(t => String(t).trim()).filter(Boolean);
+                } catch (e) {
+                    tagsArray = s.split(",").map(t => t.trim()).filter(Boolean);
+                }
+            } else {
+                tagsArray = s.split(",").map(t => t.trim()).filter(Boolean);
+            }
+        }
         formData.append("tags", JSON.stringify(tagsArray));
 
         // AdminId (string)
