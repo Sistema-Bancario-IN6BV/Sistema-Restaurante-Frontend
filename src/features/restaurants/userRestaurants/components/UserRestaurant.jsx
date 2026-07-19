@@ -8,7 +8,7 @@ import {
     useUserRestaurantStore
 } from "../store/useUserRestaurantStore";
 
-import {CreateUserRestaurantModal} from "./createUserRestaurantModal";
+import { CreateUserRestaurantModal } from "./CreateUserRestaurantModal";
 import { RestaurantDetailsModal } from "./RestaurantDetailsModal";
 
 export const UserRestaurant = () => {
